@@ -3,7 +3,7 @@
 # pylint: disable=E0611
 import sys
 from PyQt5.QtWidgets import QApplication
-from Interface.ObjectClasses.main_window import MainWindow
+from Interface.main_window import MainWindow
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

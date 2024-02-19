@@ -3,11 +3,13 @@
 # pylint: disable=E0611
 
 from os import listdir, path
+from functools import partial
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import Qt
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
+from Interface.song_window import SongWindow
 
 class MainWindow(QMainWindow):
     """Define a specialized QMainWindow subclass for Mapset Statistician."""
@@ -25,7 +27,15 @@ class MainWindow(QMainWindow):
         self.folder_button = SongFolderButton(self)
         self.folder_button.setGeometry(2,32,236,56)
 
+        self.song_window = SongWindow(self)
+        self.song_window.setGeometry(270, 60, 1140, 870)
+        self.song_window.setStyleSheet('background-color: #2a2a2a;'
+                                       'border-radius: 10px;')
+
         self.song_list = SongList(self)
+        self.song_list.setGeometry(0, 90, 240, 840)
+        self.song_list.itemSelectionChanged.connect(
+            partial(self.song_window.load_song, self.song_list.currentItem()))
 
     def refresh_songs(self):
         """Update the song select menu."""

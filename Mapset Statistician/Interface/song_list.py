@@ -39,6 +39,10 @@ class SongList(QListWidget):
             QListWidget::item:selected:!active {
                 background-color: #444444;
             }
+
+            QListWidget::item:hover {
+                background-color: #444444;
+            }
             """
         )
 

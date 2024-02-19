@@ -16,8 +16,17 @@ class SongFolderButton(QPushButton):
         font = QFont("Nunito", 10)
         self.setFont(font)
         self.setStyleSheet(
-            "QPushButton       { background-color: #111111; color: #f9d5ff; border: none; border-radius: 5px; }"
-            "QPushButton:hover { background-color: #333333; color: #f9d5ff; border: none; }")
+            """QPushButton {
+                background-color: #111111;
+                color: #f9d5ff;
+                border: none;
+                border-radius: 5px; }
+            QPushButton:hover {
+                background-color: #333333;
+                color: #f9d5ff;
+                border: none; }"
+            """
+            )
 
         self.folder_path = None
         self.clicked.connect(self.select_folder)
