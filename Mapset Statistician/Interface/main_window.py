@@ -3,7 +3,6 @@
 # pylint: disable=E0611
 
 from os import listdir, path
-from functools import partial
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import Qt
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
@@ -35,7 +34,8 @@ class MainWindow(QMainWindow):
         self.song_list = SongList(self)
         self.song_list.setGeometry(0, 90, 240, 840)
         self.song_list.itemSelectionChanged.connect(
-            partial(self.song_window.load_song, self.song_list.currentItem()))
+            lambda: self.song_window.load_song(
+                f"{self.folder_path}/{self.song_list.currentItem()}"))
 
     def refresh_songs(self):
         """Update the song select menu."""

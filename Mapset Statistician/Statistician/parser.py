@@ -7,16 +7,17 @@ from Statistician.graph_data import RawGraphData, StrainObject
 
 class Parser:
     """
-    Define a specialized parser object to process beatmap information.
-    One instance of this parser will remain active while the application runs.
+    Define a specialized parser to process beatmap information.
     """
 
-    def generate_difficulty(self, diff_path: str) -> Difficulty:
+    @staticmethod
+    def generate_difficulty(diff_path: str) -> Difficulty:
         """
         Create and return a Difficulty object from the .osu file of a difficulty.
         Takes the full path to a .osu difficulty as a string.
         """
 
+        # pylint: disable=C0301
         #I found it more intuitive to build a Difficulty this way rather than by fashioning a classmethod for it
 
         new_diff = Difficulty()
@@ -35,7 +36,7 @@ class Parser:
                 if new_diff.name() != '' and new_diff.keymode() != -1:
                     break #When the keymode and diff name are set.
 
-            # Loop through a second time because the keymode needs to be set to start generating notes.
+            # Loop through second time because keymode needs to be set to start generating notes.
             for line in f.readlines():
                 if line.count(',') == 6: #Hit object lines have 6 commas.
                     note = Note.from_parser(line[0:-1], new_diff.keymode())
@@ -47,10 +48,11 @@ class Parser:
 
         return new_diff
 
-    def generate_density_data(self, diff: Difficulty) -> RawGraphData:
+    @staticmethod
+    def generate_density_data(diff: Difficulty) -> RawGraphData:
         """Create the data for the raw density of a difficulty."""
 
-        strains = RawGraphData(f'[{Difficulty.name()}] Absolute Density')
+        strains = RawGraphData(f'[{diff.name()}] Absolute Density')
 
         for note in diff.notes():
             point = StrainObject(1.0, note.time_start(), note.hand)
