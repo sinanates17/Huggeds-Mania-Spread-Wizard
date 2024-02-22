@@ -15,9 +15,11 @@ class SongWindow(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.setStyleSheet('background-color: #2a2a2a;'
-                           'border-radius: 10px;')
-
+        self.setStyleSheet(
+            """
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            """)
         self.diff_checkboxes = []
 
     # pylint: disable=C0103
@@ -34,18 +36,26 @@ class SongWindow(QWidget):
         for f in listdir(song_path):
             if f.endswith(".osu"):
                 diff = Parser.generate_difficulty(f"{song_path}/{f}")
-                box = DiffCheckBox(diff)
+                box = DiffCheckBox(self, diff)
                 self.diff_checkboxes.append(box)
 
         #Style and place each checkbox on the SongWindow
         for box in self.diff_checkboxes:
-            box.setStyleSheet() #Left off here
+            box.setStyleSheet(
+                            """
+                            QCheckBox {
+                                width: 120px;
+                                height: 60px;
+                                background-color: #333333;
+                                border-radius: 10px
+                            }
+                            """) #Left off here
 
 class DiffCheckBox(QCheckBox):
     """Defines a QCheckBox that also stores a Difficulty."""
 
-    def __init__(self, diff: Difficulty):
-        super().__init__()
+    def __init__(self, parent, diff: Difficulty):
+        super().__init__(parent)
 
         self._difficulty = diff
 

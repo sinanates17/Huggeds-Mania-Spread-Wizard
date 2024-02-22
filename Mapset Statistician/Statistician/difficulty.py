@@ -1,7 +1,7 @@
 """This module contains a single class definition for a difficulty."""
 
-from note import Note
-from timing_point import TimingPoint
+from Statistician.note import Note
+from Statistician.timing_point import TimingPoint
 
 class Difficulty:
     """Represents a difficulty in a mapset."""
@@ -49,7 +49,7 @@ class Difficulty:
         """Set the keymode of the difficulty."""
 
         self._keymode = lanes
-        self.note_list = [[] for i in lanes]
+        self.note_list = [[] for i in range(lanes)]
 
     def keymode(self) -> int:
         """Return the keycount."""
