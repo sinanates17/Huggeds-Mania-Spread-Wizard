@@ -24,7 +24,9 @@ class SongWindow(QWidget):
 
         self.diff_checkboxes = []
 
+    # pylint: disable=C0103,W0613
     def paintEvent(self, pe): #IDK How this works, but it needs to be here for style sheets to work.
+        """Overwrite parent's paintEvent."""
         o = QStyleOption()
         o.initFrom(self)
         p = QPainter(self)
@@ -41,7 +43,6 @@ class SongWindow(QWidget):
             if f.endswith(".osu"):
                 diff = Parser.generate_difficulty(f"{song_path}/{f}")
                 box = DiffCheckBox(self, diff)
-                #box = QCheckBox(self)
                 self.diff_checkboxes.append(box)
 
         #Style and place each checkbox on the SongWindow
@@ -52,7 +53,8 @@ class SongWindow(QWidget):
                                 width: 120px;
                                 height: 60px;
                                 background-color: #333333;
-                                border-radius: 5px
+                                border-radius: 5px;
+                                color: #ab89b1;
                             }
                             """)
             box.setGeometry(30, 30 + 80*i, 110, 60) #Left off here
@@ -61,21 +63,15 @@ class SongWindow(QWidget):
 class DiffCheckBox(QCheckBox):
     """Defines a QCheckBox that also stores a Difficulty."""
 
-    def __init__(self, parent: QWidget, diff: Difficulty):
+    def __init__(self, parent, diff: Difficulty):
         super().__init__(parent)
 
-        font = QFont("Nunito", 8)
         self._difficulty = diff
         self._name = diff.name()
-        self.setText("Test")
+        self.setText(diff.name())
+        font = QFont("Nunito", 8)
+        font.setBold(True)
         self.setFont(font)
-
-    def paintEvent(self, pe):
-        """Override parent's paintEvent"""
-        o = QStyleOption()
-        o.initFrom(self)
-        p = QPainter(self)
-        self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
 
     def difficulty(self) -> Difficulty:
         """Returns the object's Difficulty."""

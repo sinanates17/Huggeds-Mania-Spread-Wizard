@@ -5,10 +5,10 @@
 from os import listdir, path
 from PyQt5.QtWidgets import QMainWindow, QCheckBox
 from PyQt5.QtCore import Qt
-from .title_bar import TitleBar #Import is being called from the root folder.
-from .song_folder_button import SongFolderButton
-from .song_list import SongList
-from .song_window import SongWindow
+from Interface.title_bar import TitleBar #Import is being called from the root folder.
+from Interface.song_folder_button import SongFolderButton
+from Interface.song_list import SongList
+from Interface.song_window import SongWindow
 
 class MainWindow(QMainWindow):
     """Define a specialized QMainWindow subclass for Mapset Statistician."""
