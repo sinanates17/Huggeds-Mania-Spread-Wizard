@@ -39,6 +39,7 @@ class SongWindow(QWidget):
             if f.endswith(".osu"):
                 diff = Parser.generate_difficulty(f"{song_path}/{f}")
                 box = DiffCheckBox(self, diff)
+                box.setText(diff.name())
                 self.diff_checkboxes.append(box)
 
         #Style and place each checkbox on the SongWindow
@@ -49,10 +50,11 @@ class SongWindow(QWidget):
                                 width: 120px;
                                 height: 60px;
                                 background-color: #333333;
-                                border-radius: 10px
+                                border-radius: 5px
                             }
                             """)
-            box.setGeometry(10, 10 + 120*i, 110, 60) #Left off here
+            box.setGeometry(30, 30 + 80*i, 110, 60) #Left off here
+            box.show()
 
 class DiffCheckBox(QCheckBox):
     """Defines a QCheckBox that also stores a Difficulty."""

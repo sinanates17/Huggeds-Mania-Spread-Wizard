@@ -3,7 +3,7 @@
 # pylint: disable=E0611
 
 from os import listdir, path
-from PyQt5.QtWidgets import QMainWindow, QWidget
+from PyQt5.QtWidgets import QMainWindow, QCheckBox
 from PyQt5.QtCore import Qt
 from .title_bar import TitleBar #Import is being called from the root folder.
 from .song_folder_button import SongFolderButton
