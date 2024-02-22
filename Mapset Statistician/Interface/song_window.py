@@ -61,7 +61,7 @@ class SongWindow(QWidget):
 class DiffCheckBox(QCheckBox):
     """Defines a QCheckBox that also stores a Difficulty."""
 
-    def __init__(self, parent, diff: Difficulty):
+    def __init__(self, parent: QWidget, diff: Difficulty):
         super().__init__(parent)
 
         font = QFont("Nunito", 8)
