@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         self.song_list.itemSelectionChanged.connect(
             lambda: self.song_window.load_song(
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
-        
+
         self.song_window = SongWindow(self)
         self.song_window.setGeometry(270, 60, 1140, 870)
 

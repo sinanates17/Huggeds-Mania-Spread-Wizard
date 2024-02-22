@@ -1,8 +1,8 @@
 """This module contains a single class to define a song folder select list."""
 
 # pylint: disable=E0611
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QStyleOption, QStyle
-from PyQt5.QtGui import QFont, QColor, QPainter
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import QSize, Qt
 
 class SongList(QListWidget):

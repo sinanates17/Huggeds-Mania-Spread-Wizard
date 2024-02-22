@@ -5,7 +5,7 @@ SongWindow and related subwidgets.
 
 # pylint: disable=E0611,W0107
 from os import listdir
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QFont
 from PyQt5.QtWidgets import QWidget, QCheckBox, QStyleOption, QStyle
 from Statistician.parser import Parser
 from Statistician.difficulty import Difficulty
@@ -33,13 +33,15 @@ class SongWindow(QWidget):
     def load_song(self, song_path):
         """Load in all the functional stuff when a song is selected."""
 
+        for box in self.diff_checkboxes:
+            box.deleteLater()
         self.diff_checkboxes = []
 
         for f in listdir(song_path):
             if f.endswith(".osu"):
                 diff = Parser.generate_difficulty(f"{song_path}/{f}")
                 box = DiffCheckBox(self, diff)
-                box.setText(diff.name())
+                #box = QCheckBox(self)
                 self.diff_checkboxes.append(box)
 
         #Style and place each checkbox on the SongWindow
@@ -62,11 +64,14 @@ class DiffCheckBox(QCheckBox):
     def __init__(self, parent, diff: Difficulty):
         super().__init__(parent)
 
+        font = QFont("Nunito", 8)
         self._difficulty = diff
         self._name = diff.name()
-        self.setText(diff.name())
+        self.setText("Test")
+        self.setFont(font)
 
-    def paintEvent(self, pe): 
+    def paintEvent(self, pe):
+        """Override parent's paintEvent"""
         o = QStyleOption()
         o.initFrom(self)
         p = QPainter(self)
@@ -76,7 +81,7 @@ class DiffCheckBox(QCheckBox):
         """Returns the object's Difficulty."""
 
         return self._difficulty
-    
+
     def name(self) -> str:
         """Returns the contained Difficulty's name."""
 
