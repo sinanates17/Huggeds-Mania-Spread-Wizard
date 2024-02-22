@@ -54,10 +54,11 @@ class SongList(QListWidget):
     def add_song(self, folder_name: str):
         """Add a song folder."""
 
-        font = QFont("Nunito", 8)
+        font = QFont("Nunito", 10)
+        font.setBold(True)
         item = QListWidgetItem()
         item.setText(folder_name)
         item.setFont(font)
-        item.setForeground(QColor("#816287"))
+        item.setForeground(QColor("#ab89b1"))
         item.setSizeHint(QSize(-1, 60))
         self.addItem(item)

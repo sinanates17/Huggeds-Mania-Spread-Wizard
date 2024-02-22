@@ -34,7 +34,12 @@ class MainWindow(QMainWindow):
         
         self.song_window = SongWindow(self)
         self.song_window.setGeometry(270, 60, 1140, 870) #WTF !
-        
+        self.song_window.setStyleSheet(
+            """
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            """)
+
     def refresh_songs(self):
         """Update the song select menu."""
 

@@ -18,6 +18,7 @@ class TitleBar(QWidget):
         self.drag_position = None
 
         font = QFont("Nunito", 10)
+        font.setBold(True)
 
         # Create a horizontal layout for the title bar
         layout = QHBoxLayout(self)

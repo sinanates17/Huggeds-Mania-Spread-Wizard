@@ -9,11 +9,12 @@ class SongFolderButton(QPushButton):
     """Define a QPushButton to act as a song folder select button."""
 
     def __init__(self, parent):
-        super().__init__(parent, text="🗀 Select Song Folder")
+        super().__init__(parent, text="🗀 Select Songs Folder")
 
         self.parent = parent
 
-        font = QFont("Nunito", 10)
+        font = QFont("Nunito", 12)
+        font.setBold(True)
         self.setFont(font)
         self.setStyleSheet(
             """QPushButton {
