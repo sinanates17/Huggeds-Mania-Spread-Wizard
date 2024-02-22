@@ -5,8 +5,8 @@ SongWindow and related subwidgets.
 
 # pylint: disable=E0611,W0107
 from os import listdir
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QCheckBox
+from PyQt5.QtGui import QPainter
+from PyQt5.QtWidgets import QWidget, QCheckBox, QStyleOption, QStyle
 from Statistician.parser import Parser
 from Statistician.difficulty import Difficulty
 
@@ -16,7 +16,19 @@ class SongWindow(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.setStyleSheet(
+            """
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            """)
+
         self.diff_checkboxes = []
+
+    def paintEvent(self, pe):
+        o = QStyleOption()
+        o.initFrom(self)
+        p = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
 
     def load_song(self, song_path):
         """Load in all the functional stuff when a song is selected."""

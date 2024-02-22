@@ -1,8 +1,8 @@
 """This module contains a single class to define a song folder select list."""
 
 # pylint: disable=E0611
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QStyleOption, QStyle
+from PyQt5.QtGui import QFont, QColor, QPainter
 from PyQt5.QtCore import QSize, Qt
 
 class SongList(QListWidget):
@@ -42,6 +42,39 @@ class SongList(QListWidget):
 
             QListWidget::item:hover {
                 background-color: #444444;
+            }
+
+            QScrollBar:vertical {
+                border: none;
+                background-color: #000000;
+                width: 12px;
+                margin: 0px 0px 0px 0px;
+            }
+            
+            QScrollBar::handle:vertical {
+                background-color: #444444;
+                min-height: 20px;
+                border-radius: 6px;
+            }
+            
+            QScrollBar::add-line:vertical {
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::sub-line:vertical {
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
             }
             """
         )

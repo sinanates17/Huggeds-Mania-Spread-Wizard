@@ -5,10 +5,10 @@
 from os import listdir, path
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from PyQt5.QtCore import Qt
-from Interface.title_bar import TitleBar #Import is being called from the root folder.
-from Interface.song_folder_button import SongFolderButton
-from Interface.song_list import SongList
-from Interface.song_window import SongWindow
+from .title_bar import TitleBar #Import is being called from the root folder.
+from .song_folder_button import SongFolderButton
+from .song_list import SongList
+from .song_window import SongWindow
 
 class MainWindow(QMainWindow):
     """Define a specialized QMainWindow subclass for Mapset Statistician."""
@@ -33,12 +33,7 @@ class MainWindow(QMainWindow):
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
         
         self.song_window = SongWindow(self)
-        self.song_window.setGeometry(270, 60, 1140, 870) #WTF !
-        self.song_window.setStyleSheet(
-            """
-            background-color: #2a2a2a;
-            border-radius: 10px;
-            """)
+        self.song_window.setGeometry(270, 60, 1140, 870)
 
     def refresh_songs(self):
         """Update the song select menu."""
