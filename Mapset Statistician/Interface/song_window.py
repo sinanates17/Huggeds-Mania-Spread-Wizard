@@ -24,7 +24,7 @@ class SongWindow(QWidget):
 
         self.diff_checkboxes = []
 
-    def paintEvent(self, pe):
+    def paintEvent(self, pe): #IDK How this works, but it needs to be here for style sheets to work.
         o = QStyleOption()
         o.initFrom(self)
         p = QPainter(self)
@@ -42,7 +42,7 @@ class SongWindow(QWidget):
                 self.diff_checkboxes.append(box)
 
         #Style and place each checkbox on the SongWindow
-        for box in self.diff_checkboxes:
+        for i, box in enumerate(self.diff_checkboxes):
             box.setStyleSheet(
                             """
                             QCheckBox {
@@ -51,7 +51,8 @@ class SongWindow(QWidget):
                                 background-color: #333333;
                                 border-radius: 10px
                             }
-                            """) #Left off here
+                            """)
+            box.setGeometry(10, 10 + 120*i, 110, 60) #Left off here
 
 class DiffCheckBox(QCheckBox):
     """Defines a QCheckBox that also stores a Difficulty."""
@@ -60,8 +61,21 @@ class DiffCheckBox(QCheckBox):
         super().__init__(parent)
 
         self._difficulty = diff
+        self._name = diff.name()
+        self.setText(diff.name())
+
+    def paintEvent(self, pe): 
+        o = QStyleOption()
+        o.initFrom(self)
+        p = QPainter(self)
+        self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
 
     def difficulty(self) -> Difficulty:
         """Returns the object's Difficulty."""
 
         return self._difficulty
+    
+    def name(self) -> str:
+        """Returns the contained Difficulty's name."""
+
+        return self._name
