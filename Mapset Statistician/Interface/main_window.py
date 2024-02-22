@@ -66,3 +66,4 @@ class MainWindow(QMainWindow):
         size = event.size()
         self.title.setGeometry(0, 0, size.width(), 30)
         self.song_list.setGeometry(0, 90, 240, size.height() - 120)
+        #self.song_window.setGeometry(270, 60, size.height() - 90, size.width() - 300)
