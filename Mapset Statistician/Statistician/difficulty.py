@@ -2,6 +2,7 @@
 
 from Statistician.note import Note
 from Statistician.timing_point import TimingPoint
+from Statistician.graph_data import RawGraphData
 
 class Difficulty:
     """Represents a difficulty in a mapset."""
@@ -11,9 +12,21 @@ class Difficulty:
         self._timing_list = []
         self._name = ''
         self._keymode = -1
+        self._artist = ''
+        self._title = ''
+        self._host = ''
+
+        self.data = { #Initially empty RawGraphData containers for the various stats to display
+            "density"       : RawGraphData("Absolute Density")
+            #"ln_density"   : RawGraphData("LN Density")      #Total LN-only density
+            #"rc_density"   : RawGraphData("Rice Density")    #Total RC-only density
+            #"jacks"        : RawGraphData("Jack Intensity")  #Stacks below threshold count as jacks
+            #"asynch"       : RawGraphData("Asynch Releases") #Simple count of asynchronous releases
+            #"hybridness"   : RawGraphData("Hybridness")      #RC intensity scaled by concurrent LNs
+        }
 
     def __repr__(self) -> str:
-        return f"[{self.name}]"
+        return f"[{self._name}]"
 
     def add_note(self, hit_object: Note):
         """Adds a Note object to self.note_list."""
@@ -23,7 +36,7 @@ class Difficulty:
     def notes(self) -> list[Note]:
         """Returns the list of all notes."""
 
-        return self._note_list()
+        return self._note_list
 
     def add_timing_point(self, time_point: TimingPoint):
         """Adds a Note object to self.note_list."""
@@ -49,9 +62,39 @@ class Difficulty:
         """Set the keymode of the difficulty."""
 
         self._keymode = lanes
-        self.note_list = [[] for i in range(lanes)]
+        self._note_list = [[] for i in range(lanes)]
 
     def keymode(self) -> int:
         """Return the keycount."""
 
         return self._keymode
+
+    def set_artist(self, artist: str):
+        """Sets the artist."""
+
+        self._artist = artist
+
+    def artist(self) -> str:
+        """Returns the artist."""
+
+        return self._artist
+
+    def set_title(self, title: str):
+        """Sets the title."""
+
+        self._title = title
+
+    def title(self) -> str:
+        """Returns the title"""
+
+        return self._title
+
+    def set_host(self, host: str):
+        """Sets the host."""
+
+        self._host = host
+
+    def host(self) -> str:
+        """Returns the host."""
+
+        return self._host

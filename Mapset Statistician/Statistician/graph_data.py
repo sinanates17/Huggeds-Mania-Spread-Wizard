@@ -1,6 +1,6 @@
 """This module contains class definition for GraphData and StrainObject"""
 
-from Statistician.note import Hand
+#from Statistician.note import Hand
 
 class StrainObject:
     """Contains a value, timestamp, and hand. A glorified tuple."""
@@ -15,10 +15,22 @@ class RawGraphData:
 
     def __init__(self, name):
         self._name = name
-        self.points = []
+        self._points = []
 
     def __repr__(self) -> str:
         return self._name
-    
+
     def add_point(self, point: StrainObject):
-        self.points.append(point)
+        """Adds a StrainObject to the list of point."""
+
+        self._points.append(point)
+
+    def points(self) -> list[StrainObject]:
+        """Returns the list of StrainObjects"""
+
+        return self._points
+
+    def clear(self):
+        """Clear all strain points."""
+
+        self._points.clear()

@@ -3,7 +3,7 @@
 from Statistician.difficulty import Difficulty
 from Statistician.note import Note
 from Statistician.timing_point import TimingPoint
-from Statistician.graph_data import RawGraphData, StrainObject
+from Statistician.graph_data import StrainObject
 
 class Parser:
     """
@@ -24,21 +24,30 @@ class Parser:
 
         with open(diff_path, 'r', encoding='utf8') as f:
             for line in f.readlines():
-                if 'Tags' in line or 'Bookmarks' in line or 'Title' in line or 'Artist' in line or 'Source' in line:
-                    continue #Avoid potential conflicts with the last two cases.
-
-                elif 'Version' in line:
+                if 'Version' in line:
                     new_diff.set_name(line[8:-1])
 
                 elif 'CircleSize' in line:
                     new_diff.set_keymode(int(line[11:-1]))
+
+                elif 'Title:' in line:
+                    new_diff.set_title(line[6:-1])
+
+                elif 'Artist:' in line:
+                    new_diff.set_artist(line[7:-1])
+
+                elif 'Creator:' in line:
+                    new_diff.set_host(line[8:-1])
 
                 if new_diff.name() != '' and new_diff.keymode() != -1:
                     break #When the keymode and diff name are set.
 
             # Loop through second time because keymode needs to be set to start generating notes.
             for line in f.readlines():
-                if line.count(',') == 6: #Hit object lines have 6 commas.
+                if 'Tags' in line or 'Bookmarks' in line or 'Title' in line or 'Artist' in line or 'Source' in line:
+                    continue #Avoid potential conflicts with the last two cases.
+
+                elif line.count(',') == 6: #Hit object lines have 6 commas.
                     note = Note.from_parser(line[0:-1], new_diff.keymode())
                     new_diff.add_note(note)
 
@@ -49,11 +58,11 @@ class Parser:
         return new_diff
 
     @staticmethod
-    def generate_density_data(diff: Difficulty) -> RawGraphData:
-        """Create the data for the raw density of a difficulty."""
+    def generate_density_data(diff: Difficulty):
+        """Append StrainObjects into the "density" RawGraphData of diff."""
 
-        strains = RawGraphData(f'[{diff.name()}] Absolute Density')
+        data = diff.data["density"]
 
         for note in diff.notes():
             point = StrainObject(1.0, note.time_start(), note.hand)
-            strains.add_point(point)
+            data.add_point(point)
