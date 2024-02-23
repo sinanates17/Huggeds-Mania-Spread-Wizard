@@ -1,7 +1,7 @@
 """This module contains a single class to define a song folder select list."""
 
 # pylint: disable=E0611
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import QSize, Qt
 
@@ -12,13 +12,14 @@ class SongList(QListWidget):
         super().__init__(parent)
 
         self.setWordWrap(True)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setUniformItemSizes(True)
         self.setFocusPolicy(Qt.NoFocus)  # Remove focus rectangle
         self.setStyleSheet(#Style sheet taken from K0nomi with some changes
             """
             QListWidget {
                 border-radius: 10px;
-                border: 2px solid #111111;
+                border: none;
                 background-color: #111111;
                 color: #ffffff;
             }
@@ -33,31 +34,34 @@ class SongList(QListWidget):
             }
             
             QListWidget::item:selected {
-                background-color: #333333;
+                background-color: #666666;
             }
             
             QListWidget::item:selected:!active {
-                background-color: #444444;
+                background-color: #666666;
             }
 
             QListWidget::item:hover {
                 background-color: #444444;
             }
-
-            QScrollBar:vertical {
+            """
+        )
+        scroll_bar = QScrollBar(self)
+        scroll_bar.setStyleSheet("""
+            QScrollBar {
                 border: none;
-                background-color: #000000;
-                width: 12px;
+                background-color: #111111;
+                width: 10px;
                 margin: 0px 0px 0px 0px;
             }
             
-            QScrollBar::handle:vertical {
-                background-color: #444444;
+            QScrollBar::handle {
+                background-color: #666666;
                 min-height: 20px;
-                border-radius: 6px;
+                border-radius: 5px;
             }
             
-            QScrollBar::add-line:vertical {
+            QScrollBar::add-line{
                 border: none;
                 background: none;
                 height: 0px;
@@ -65,7 +69,7 @@ class SongList(QListWidget):
                 subcontrol-origin: margin;
             }
             
-            QScrollBar::sub-line:vertical {
+            QScrollBar::sub-line {
                 border: none;
                 background: none;
                 height: 0px;
@@ -73,11 +77,11 @@ class SongList(QListWidget):
                 subcontrol-origin: margin;
             }
             
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            QScrollBar::add-page, QScrollBar::sub-page {
                 background: none;
             }
-            """
-        )
+            """)
+        self.setVerticalScrollBar(scroll_bar)
 
     def clear_songs(self):
         """Clear all song folders."""
