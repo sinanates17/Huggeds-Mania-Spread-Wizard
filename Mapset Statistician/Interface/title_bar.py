@@ -35,7 +35,7 @@ class TitleBar(QWidget):
         self.spacer.setStyleSheet("background-color: #222222; color: #f9d5ff;")
         self.spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.spacer.setFixedHeight(30)
-        self.spacer.setText("  Mapset Statistician")
+        self.spacer.setText("  Mapset Statistician by Hugged")
         self.spacer.setFont(font)
         self.spacer.setAlignment(Qt.AlignVCenter)
         layout.addWidget(self.spacer)

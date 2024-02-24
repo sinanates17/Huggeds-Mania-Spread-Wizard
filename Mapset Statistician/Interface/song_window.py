@@ -7,7 +7,9 @@ SongWindow and related subwidgets.
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider, QVBoxLayout
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 from Statistician.parser import Parser
 from Statistician.difficulty import Difficulty
 
@@ -24,6 +26,7 @@ class SongWindow(QWidget):
             """)
 
         self.diff_checkboxes = []
+        self.widgets = []
         self.smoothing = 150
 
         self.label_title = QLabel(self)
@@ -33,6 +36,8 @@ class SongWindow(QWidget):
         self.label_title.setStyleSheet("""
             color: #dddddd;
             """)
+        self.label_title.hide()
+        self.widgets.append(self.label_title)
 
         self.label_creator = QLabel("Please select a beatmap folder...", self)
         creator_font = QFont("Nunito",24)
@@ -41,6 +46,7 @@ class SongWindow(QWidget):
         self.label_creator.setStyleSheet("""
             color: #888888;
             """)
+        self.widgets.append(self.label_creator)
 
         self.diff_list = QListWidget(self)
         self.diff_list.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -143,6 +149,8 @@ class SongWindow(QWidget):
             }
             """)
         self.diff_list.setVerticalScrollBar(scroll_bar)
+        self.diff_list.hide()
+        self.widgets.append(self.diff_list)
 
         self.label_diff = QLabel("Select difficulties\nto compare", self)
         diff_font = QFont("Nunito",16)
@@ -152,13 +160,47 @@ class SongWindow(QWidget):
         self.label_diff.setStyleSheet("""
             color: #888888
             """)
+        self.label_diff.hide()
+        self.widgets.append(self.label_diff)
 
-        self.smoothing_slider = QSlider(self)
+        self.smoothing_slider = QSlider(Qt.Horizontal, self)
         self.smoothing_slider.setMinimum(10)
-        self.smoothing_slider.setMaximum(810)
+        self.smoothing_slider.setMaximum(811)
         self.smoothing_slider.setValue(150)
+        self.smoothing_slider.valueChanged.connect(self.change_smoothing)
+        self.smoothing_slider.setGeometry(270, 840, 800, 40)
+        self.smoothing_slider.setStyleSheet(
+            """
+            QSlider::groove:horizontal {
+                background: #666666;
+                height: 40px;
+                border-radius: 20px;
+            }
+            QSlider::handle:horizontal {
+                background: #dddddd;
+                height: 40px;
+                width: 40px;
+                border-radius: 20px;
+            }
+            """
+        )
         self.smoothing_slider.hide()
-        # Implement a label showing the smoothing value.
+        self.widgets.append(self.smoothing_slider)
+
+        self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
+        self.label_smoothing.setFont(diff_font)
+        self.label_smoothing.setGeometry(270, 800, 800, 40)
+        self.label_smoothing.setAlignment(Qt.AlignCenter)
+        self.label_smoothing.setStyleSheet("""
+            color: #888888
+            """)
+        self.label_smoothing.hide()
+        self.widgets.append(self.label_smoothing)
+
+        self.plot = MapPlotWidget(self)
+        self.plot.setGeometry(30,160,1240,310)
+        self.plot.hide()
+        self.widgets.append(self.plot)
 
     # pylint: disable=C0103,W0613
     def paintEvent(self, pe): #IDK How this works, but it needs to be here for style sheets to work.
@@ -176,11 +218,13 @@ class SongWindow(QWidget):
         pen.setColor(QColor(17, 17, 17))
         qp.setPen(pen)
         qp.drawLine(0, 130, 1300, 130)
-        qp.drawLine(240, 500, 240, 1000)
         qp.end()
 
     def load_song(self, song_path):
         """Load in all the functional stuff when a song is selected."""
+
+        for w in self.widgets:
+            w.show()
 
         self.diff_list.clear()
 
@@ -200,7 +244,8 @@ class SongWindow(QWidget):
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
 
-        self.smoothing = v if v <= 500 else (500 + 10*(v-500) if v <= 650 else 2000 + 50*(v-650))
+        self.smoothing = v if v <= 500 else (490 + 10*(v-500) if v <= 650 else 1950 + 50*(v-650))
+        self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
 
         # Implement code to visually smooth the graph
 
@@ -226,3 +271,17 @@ class DiffItem(QListWidgetItem):
         """Returns the contained Difficulty's name."""
 
         return self._name
+
+class MapPlotWidget(QWidget):
+    """Specialized widget with embedded MatPlotLib Plot for this application."""
+
+    def __init__(self, parent=None):
+        super(MapPlotWidget, self).__init__(parent)
+
+        fig = Figure()
+        ax = fig.add_subplot(111)
+        ax.plot([1, 2, 3], [1, 2, 3])
+
+        layout = QVBoxLayout(self)
+        self.canvas = FigureCanvas(fig)
+        layout.addWidget(self.canvas)

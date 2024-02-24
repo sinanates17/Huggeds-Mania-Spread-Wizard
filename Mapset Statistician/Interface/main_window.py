@@ -24,19 +24,26 @@ class MainWindow(QMainWindow):
 
         self.folder_path = None
         self.folder_button = SongFolderButton(self)
-        self.folder_button.setGeometry(2,32,236,56)
+        x = int(self.size().width()/2)
+        y = int(self.size().height()/2)
+        self.folder_button.setGeometry(x-120, y-40, 240, 80)
 
         self.song_list = SongList(self)
-        self.song_list.setGeometry(0, 90, 240, 880)
+        self.song_list.setGeometry(30, 60, 210, 910)
         self.song_list.itemSelectionChanged.connect(
             lambda: self.song_window.load_song(
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
+        self.song_list.hide()
 
         self.song_window = SongWindow(self)
         self.song_window.setGeometry(270, 60, 1300, 910)
+        self.song_window.hide()
 
     def refresh_songs(self):
         """Update the song select menu."""
+
+        self.song_window.show()
+        self.song_list.show()
 
         self.folder_path = self.folder_button.folder_path
 
@@ -60,5 +67,5 @@ class MainWindow(QMainWindow):
 
         size = event.size()
         self.title.setGeometry(0, 0, size.width(), 30)
-        self.song_list.setGeometry(0, 90, 240, size.height() - 120)
+        self.song_list.setGeometry(30, 60, 210, size.height() - 90)
         #self.song_window.setGeometry(270, 60, size.height() - 90, size.width() - 300)
