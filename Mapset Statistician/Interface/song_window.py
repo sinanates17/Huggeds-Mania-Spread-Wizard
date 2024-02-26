@@ -3,11 +3,12 @@ This module contains class definitions for
 SongWindow and related subwidgets.
 """
 
-# pylint: disable=E0611,W0107,C0301
+# pylint: disable=E0611,W0107,C0301,C0103
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider, QVBoxLayout
+from mutagen.wave import WAVE
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from Statistician.parser import Parser
@@ -19,15 +20,23 @@ class SongWindow(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.diff_checkboxes = []
+        self.widgets = []
+        self.smoothing = 150 #+- time in ms to take a rolling average in the diff plots.
+        self.sample_interval = 28 # Every x ms, sample the raw data to calculate a rolling average.
+                                  #     Scales with smoothing to alleviate computational load.
+        self.audio_path = ''
+        self.length = 0
+
+        self._init_ui()
+
+    def _init_ui(self):
+        """Help to condense __init__ a little."""
         self.setStyleSheet(
             """
             background-color: #2a2a2a;
             border-radius: 10px;
             """)
-
-        self.diff_checkboxes = []
-        self.widgets = []
-        self.smoothing = 150
 
         self.label_title = QLabel(self)
         title_font = QFont("Nunito",32)
@@ -164,7 +173,7 @@ class SongWindow(QWidget):
         self.widgets.append(self.label_diff)
 
         self.smoothing_slider = QSlider(Qt.Horizontal, self)
-        self.smoothing_slider.setMinimum(10)
+        self.smoothing_slider.setMinimum(50)
         self.smoothing_slider.setMaximum(811)
         self.smoothing_slider.setValue(150)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
@@ -240,17 +249,25 @@ class SongWindow(QWidget):
         ref = self.diff_checkboxes[0].difficulty()
         self.label_title.setText(f"{ref.artist()} - {ref.title()}")
         self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
+        self.audio_path = ref.audio()
+
+        audio = WAVE(self.audio_path)
+        self.length = int(audio.info.length * 1000) #Extract the length in ms of the mapset's audio.
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
 
         self.smoothing = v if v <= 500 else (490 + 10*(v-500) if v <= 650 else 1950 + 50*(v-650))
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
+        self.sample_interval = self.smoothing ** (2/3)
 
         # Implement code to visually smooth the graph
 
+    def calculate_density(self, smoothing, interval):
+        """Calculate the series for 'Absolute Density' and 'Hand Balance'."""
+
 class DiffItem(QListWidgetItem):
-    """Defines a QCheckBox that also stores a Difficulty."""
+    """Defines a QCheckBox that also stores a Difficulty and graph series."""
 
     def __init__(self, parent, diff: Difficulty):
         super().__init__(parent)
@@ -261,6 +278,20 @@ class DiffItem(QListWidgetItem):
         font = QFont("Nunito", 8)
         font.setBold(True)
         self.setFont(font)
+
+        #Each series is a list of tuples of the format (Timestamp, Strain per second)
+        #Strain per second could mean NPS or occurances per second of some pattern type.
+        self.series = {
+            "Absolute Density" : [],
+            "Hand Balance" : [],
+            #"LN Density" : [],
+            #"LN Hand Balance" : [],
+            #"RC Density" : [],
+            #"RC Hand Balance" : [],
+            #"Jack Intensity" : [],
+            #"Jack Hand Balance" : [],
+            #"Asynchronous Releases" : []
+        }
 
     def difficulty(self) -> Difficulty:
         """Returns the object's Difficulty."""
@@ -279,8 +310,8 @@ class MapPlotWidget(QWidget):
         super(MapPlotWidget, self).__init__(parent)
 
         fig = Figure()
-        ax = fig.add_subplot(111)
-        ax.plot([1, 2, 3], [1, 2, 3])
+        #ax = fig.add_subplot(111)
+        #ax.plot([1, 2, 3], [1, 2, 3])
 
         layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(fig)

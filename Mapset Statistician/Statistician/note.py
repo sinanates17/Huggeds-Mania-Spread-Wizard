@@ -3,11 +3,12 @@
 from enum import Enum
 
 class Hand(Enum):
-        """Represents which hand a note is played by."""
+    """Represents which hand a note is played by."""
 
-        LEFT = -1
-        AMBI = 0
-        RIGHT = 1
+    LEFT = -1
+    AMBI = 0
+    RIGHT = 1
+    NONE = None
 
 class Note:
     """Defines a single note."""
@@ -29,7 +30,7 @@ class Note:
         lane = int(int(l[0])/(512/keymode))
         time = int(l[2])
         typ = int(l[3])
-        end = time if type == 1 else int(l[5].split(':')[0]) #(This is fucking stupid and unreadable just trust)
+        end = time if type == 1 else int(l[5].split(':')[0])
         hand = Hand.AMBI
 
         if lane < (keymode/2) + .5:
@@ -45,23 +46,23 @@ class Note:
     def is_rice(self): # Check if the note is rice.
         """Returns True if note is rice."""
         return self._note_type != 128
-    
+
     def hand(self) -> Hand:
         """Returns what hand the note is played by."""
 
         return self._hand
-    
+
     def lane(self) -> int:
-         """Returns the lane of the note."""
+        """Returns the lane of the note."""
 
-         return self._lane
-    
+        return self._lane
+
     def time_start(self) -> int:
-         """Returns the timestamp of the note."""
+        """Returns the timestamp of the note."""
 
-         return self._start_time
-    
+        return self._start_time
+
     def time_end(self) -> int:
-         """Returns the timestamp of the end of the note (same as the start if rice)."""
+        """Returns the timestamp of the end of the note (same as the start if rice)."""
 
-         return self._end_time
+        return self._end_time

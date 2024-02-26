@@ -39,8 +39,11 @@ class Parser:
                 elif 'Creator:' in line:
                     new_diff.set_host(line[8:-1])
 
-                if new_diff.name() != '' and new_diff.keymode() != -1:
-                    break #When the keymode and diff name are set.
+                elif "AudioFilename:" in line:
+                    new_diff.set_audio(line[15:-1])
+
+                elif "[TimingPoints]" in line:
+                    break
 
             # Loop through second time because keymode needs to be set to start generating notes.
             for line in f.readlines():

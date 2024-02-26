@@ -15,6 +15,7 @@ class Difficulty:
         self._artist = ''
         self._title = ''
         self._host = ''
+        self._audio = ''
 
         self.data = { #Initially empty RawGraphData containers for the various stats to display
             "density"       : RawGraphData("Absolute Density")
@@ -98,3 +99,13 @@ class Difficulty:
         """Returns the host."""
 
         return self._host
+
+    def set_audio(self, audio: str):
+        """Set the audio file"""
+
+        self._audio = audio
+
+    def audio(self) -> str:
+        """Returns the audio file name."""
+
+        return self._audio
