@@ -1,3 +1,5 @@
 PyQt5
 tk
 matplotlib
+audioread
+ffmpeg (added to PATH)
