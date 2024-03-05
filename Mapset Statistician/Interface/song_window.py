@@ -6,7 +6,7 @@ This module contains a class definition for SongWindow.
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QAbstractItemView, QScrollBar, QSlider
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider
 from audioread import audio_open
 from Interface.map_plot_widget import MapPlotWidget
 from Interface.diff_item import DiffItem
@@ -30,6 +30,7 @@ class SongWindow(QWidget):
         self.label_title = QLabel(self)
         self.label_creator = QLabel("Please select a beatmap folder...", self)
         self.diff_list = QListWidget(self)
+        self.plot_list = QListWidget(self)
         self.label_diff = QLabel("Select difficulties\nto compare", self)
         self.smoothing_slider = QSlider(Qt.Horizontal, self)
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
@@ -61,11 +62,92 @@ class SongWindow(QWidget):
             """)
         self.widgets.append(self.label_creator)
 
+        self.plot_list.setFocusPolicy(Qt.NoFocus)
+        self.plot_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.plot_list.setWordWrap(True)
+        self.plot_list.setGeometry(1090, 560, 180, 320)
+        self.plot_list.itemSelectionChanged.connect(
+            lambda: self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems()
+            )
+        )
+
+        self.plot_list.setStyleSheet("""
+            QListWidget {
+                border-radius: 10px;
+                border: none;
+                background-color: #2a2a2a;
+                color: #dddddd;
+            }
+            
+            QListWidget::item {
+                background-color: #444444;
+                padding: 5px;
+                height: 40px;
+                width: 148px;
+                margin: 2px;
+                border-radius: 5px;
+            }
+            
+            QListWidget::item:selected {
+                background-color: #888888;
+                border: none;
+            }
+
+            QListWidget::item:hover {
+                background-color: #666666;
+            }
+
+            QScrollBar {
+                border: none;
+                background-color: #2a2a2a;
+                width: 12px;
+                margin: 0px 0px 0px 0px;
+            }
+            
+            QScrollBar::handle {
+                background-color: #444444;
+                min-height: 20px;
+                border-radius: 6px;
+            }
+            
+            QScrollBar::add-line{
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::sub-line {
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::add-page, QScrollBar::sub-page {
+                background: none;
+            }
+            """)
+        self.plot_list.hide()
+        self.widgets.append(self.plot_list)
+
+        plot_font = QFont("Nunito", 8)
+        plot_font.setBold(True)
+        items = []
+        for key in ["Absolute Density", "Hand Balance"]:
+            item = QListWidgetItem(key)
+            item.setFont(plot_font)
+            self.plot_list.addItem(item)
+            items.append(item)
+        self.plot_list.setCurrentItem(items[0])
+
         self.diff_list.setSelectionMode(QAbstractItemView.MultiSelection)
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.diff_list.itemSelectionChanged.connect(
-            lambda: self.plot.update_plots("Absolute Density", self.diff_list.selectedItems()
+            lambda: self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems()
             )
         )
         self.diff_list.setWordWrap(True)
@@ -279,7 +361,7 @@ class SongWindow(QWidget):
         for diff in self.diff_checkboxes:
             diff.process_density(self.smoothing, self.sample_interval, self.length)
 
-        self.plot.update_plots("Absolute Density", self.diff_list.selectedItems())
+        self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
 
     def duration(self) -> int:
         """Returns the song length in ms"""

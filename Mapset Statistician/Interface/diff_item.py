@@ -84,10 +84,10 @@ class DiffItem(QListWidgetItem):
             r_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI])
 
             #This variable has the range [0,inf]
-            ratio = -1 if l_total == 0 else r_total / l_total
+            ratio = r_total / .001 if l_total == 0 else r_total / l_total
 
             #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
-            balance = -1 if ratio == -1 else 1 - (2 / (ratio + 1))
+            balance = 1 - (2 / (ratio + 1))
 
             ad_times.append(t)
             ad_values.append(nps)

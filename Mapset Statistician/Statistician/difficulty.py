@@ -71,9 +71,10 @@ class Difficulty:
                     timing = False
                     mapping = True
 
-                elif timing and "," in line:
-                    point = TimingPoint.from_dot_osu(line[0:-1])
-                    timings.append(point)
+                #Not using TimingPoints for now.
+                #elif timing and "," in line:
+                    #point = TimingPoint.from_dot_osu(line[0:-1])
+                    #timings.append(point)
 
                 elif mapping and "," in line:
                     note = Note.from_dot_osu(line[0:-1], keymode)

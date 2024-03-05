@@ -8,7 +8,7 @@ class TimingPoint:
 
     def __init__(self, time, beat_length, meter, sample_set,
                  sample_index, volume, uninherited, effects):
-        self._time = int(time)
+        self._time = int(float(time))
         self._beat_length = float(beat_length)
         self._meter = int(meter)
         self._sample_set = int(sample_set)
