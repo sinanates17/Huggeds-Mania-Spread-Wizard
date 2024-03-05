@@ -3,7 +3,10 @@
 # pylint: disable=E0611,W0107,C0301,C0103
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
+#from matplotlib.backends.backend_gtk3 import (
+    #NavigationToolbar2GTK3 as NavigationToolbar)
+#from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from Interface.diff_item import DiffItem
 
 class MapPlotWidget(QWidget):
@@ -12,8 +15,9 @@ class MapPlotWidget(QWidget):
     def __init__(self, parent=None):
         super(MapPlotWidget, self).__init__(parent)
 
-        self.fig = Figure()
-        self.ax = self.fig.add_subplot(111)
+        self.parent = parent
+        self.fig, self.ax = plt.subplots()
+        #self.ax = self.fig.add_subplot(111)
         self.ax.set(xlim=(0,10),ylim=(0,10))
 
         layout = QVBoxLayout(self)

@@ -20,8 +20,8 @@ class SongWindow(QWidget):
 
         self.diff_checkboxes = []
         self.widgets = []
-        self.smoothing = 1000 #+- time in ms to take a rolling average in the diff plots.
-        self.sample_interval = 500 # Every x ms, sample the raw data to calculate a rolling average.
+        self.smoothing = 1500 #+- time in ms to take a rolling average in the diff plots.
+        self.sample_interval = 600 # Every x ms, sample the raw data to calculate a rolling average.
                                   #     Scales with smoothing to alleviate computational load.
         self.audio_path = ''
         self.length = 0
@@ -178,9 +178,9 @@ class SongWindow(QWidget):
         self.label_diff.hide()
         self.widgets.append(self.label_diff)
 
-        self.smoothing_slider.setMinimum(50)
-        self.smoothing_slider.setMaximum(811)
-        self.smoothing_slider.setValue(551)
+        self.smoothing_slider.setMinimum(3)
+        self.smoothing_slider.setMaximum(100)
+        self.smoothing_slider.setValue(15)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
         self.smoothing_slider.setGeometry(270, 840, 800, 40)
         self.smoothing_slider.setStyleSheet(
@@ -235,39 +235,46 @@ class SongWindow(QWidget):
     def load_song(self, song_path):
         """Load in all the functional stuff when a song is selected."""
 
-        for w in self.widgets:
-            w.show()
-
         self.diff_list.clear()
 
         self.diff_checkboxes = []
 
         for f in listdir(song_path):
             if f.endswith(".osu"):
-                diff = Difficulty.from_path(f"{song_path}/{f}")
-                box = DiffItem(self.diff_list, diff)
-                self.diff_checkboxes.append(box)
-                self.diff_list.addItem(box)
+                with open(f"{song_path}/{f}", "r", encoding="utf8") as g:
+                    for line in g.readlines():
+                        if "Mode:" in line:
+                            if "Mode: 3" in line:
+                                diff = Difficulty.from_path(f"{song_path}/{f}")
+                                box = DiffItem(self.diff_list, diff)
+                                self.diff_checkboxes.append(box)
+                                self.diff_list.addItem(box)
+                            else:
+                                break
 
-        ref = self.diff_checkboxes[0].difficulty()
-        self.label_title.setText(f"{ref.artist()} - {ref.title()}")
-        self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
-        self.audio_path = f"{song_path}/{ref.audio()}"
+        if len(self.diff_checkboxes) > 0:
+            for w in self.widgets:
+                w.show()
 
-        with audio_open(self.audio_path) as f:
-            self.length = int(f.duration * 1000) #Extract the length in ms of the mapset's audio.
+            ref = self.diff_checkboxes[0].difficulty()
+            self.label_title.setText(f"{ref.artist()} - {ref.title()}")
+            self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
+            self.audio_path = f"{song_path}/{ref.audio()}"
 
-        for box in self.diff_checkboxes:
-            box.process_density(self.smoothing, self.sample_interval, self.length) #Temporarily here until I add support to select which graph to show
+            with audio_open(self.audio_path) as f:
+                self.length = int(f.duration * 1000) #Extract the length in ms of the mapset's audio.
 
-        self.plot.set_axisx(self.length)
+            for box in self.diff_checkboxes:
+                box.process_density(self.smoothing, self.sample_interval, self.length) #Temporarily here until I add support to select which graph to show
+
+            self.plot.set_axisx(self.length)
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
 
-        self.smoothing = v if v <= 500 else (490 + 10*(v-500) if v <= 650 else 1950 + 50*(v-650))
+        self.smoothing = v * 100
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
-        self.sample_interval = self.smoothing / 2 #self.smoothing ** (2/3)
+        self.sample_interval = self.smoothing / 2.5 #self.smoothing ** (2/3)
 
         for diff in self.diff_checkboxes:
             diff.process_density(self.smoothing, self.sample_interval, self.length)
