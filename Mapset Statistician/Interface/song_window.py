@@ -8,11 +8,12 @@ from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider, QVBoxLayout
-from mutagen.wave import WAVE
+from audioread import audio_open
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from Statistician.parser import Parser
+
 from Statistician.difficulty import Difficulty
+from Statistician.note import Hand
 
 class SongWindow(QWidget):
     """Defines a QWidget which will contain things specific to the selected mapset"""
@@ -28,6 +29,14 @@ class SongWindow(QWidget):
         self.audio_path = ''
         self.length = 0
 
+        #Create all child widgets then run _init_ui to set them up
+        self.label_title = QLabel(self)
+        self.label_creator = QLabel("Please select a beatmap folder...", self)
+        self.diff_list = QListWidget(self)
+        self.label_diff = QLabel("Select difficulties\nto compare", self)
+        self.smoothing_slider = QSlider(Qt.Horizontal, self)
+        self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
+        self.plot = MapPlotWidget(self)
         self._init_ui()
 
     def _init_ui(self):
@@ -38,7 +47,6 @@ class SongWindow(QWidget):
             border-radius: 10px;
             """)
 
-        self.label_title = QLabel(self)
         title_font = QFont("Nunito",32)
         self.label_title.setFont(title_font)
         self.label_title.setGeometry(30, 20, 1240, 60)
@@ -48,7 +56,6 @@ class SongWindow(QWidget):
         self.label_title.hide()
         self.widgets.append(self.label_title)
 
-        self.label_creator = QLabel("Please select a beatmap folder...", self)
         creator_font = QFont("Nunito",24)
         self.label_creator.setFont(creator_font)
         self.label_creator.setGeometry(30, 80, 1240, 40)
@@ -57,10 +64,13 @@ class SongWindow(QWidget):
             """)
         self.widgets.append(self.label_creator)
 
-        self.diff_list = QListWidget(self)
         self.diff_list.setSelectionMode(QAbstractItemView.MultiSelection)
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.diff_list.itemSelectionChanged.connect(
+            lambda: self.plot.update_plots("Absolute Density", self.diff_list.selectedItems()
+            )
+        )
         self.diff_list.setWordWrap(True)
         self.diff_list.setGeometry(30, 560, 180, 320)
         self.diff_list.setStyleSheet("""
@@ -161,7 +171,6 @@ class SongWindow(QWidget):
         self.diff_list.hide()
         self.widgets.append(self.diff_list)
 
-        self.label_diff = QLabel("Select difficulties\nto compare", self)
         diff_font = QFont("Nunito",16)
         self.label_diff.setFont(diff_font)
         self.label_diff.setAlignment(Qt.AlignCenter)
@@ -172,7 +181,6 @@ class SongWindow(QWidget):
         self.label_diff.hide()
         self.widgets.append(self.label_diff)
 
-        self.smoothing_slider = QSlider(Qt.Horizontal, self)
         self.smoothing_slider.setMinimum(50)
         self.smoothing_slider.setMaximum(811)
         self.smoothing_slider.setValue(150)
@@ -196,7 +204,6 @@ class SongWindow(QWidget):
         self.smoothing_slider.hide()
         self.widgets.append(self.smoothing_slider)
 
-        self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
         self.label_smoothing.setFont(diff_font)
         self.label_smoothing.setGeometry(270, 800, 800, 40)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
@@ -206,7 +213,6 @@ class SongWindow(QWidget):
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
 
-        self.plot = MapPlotWidget(self)
         self.plot.setGeometry(30,160,1240,310)
         self.plot.hide()
         self.widgets.append(self.plot)
@@ -241,18 +247,21 @@ class SongWindow(QWidget):
 
         for f in listdir(song_path):
             if f.endswith(".osu"):
-                diff = Parser.generate_difficulty(f"{song_path}/{f}")
+                diff = Difficulty.from_path(f"{song_path}/{f}")
                 box = DiffItem(self.diff_list, diff)
+                box.process_density(self.smoothing, self.sample_interval) #Temporarily here until I add support to select which graph to show
                 self.diff_checkboxes.append(box)
                 self.diff_list.addItem(box)
 
         ref = self.diff_checkboxes[0].difficulty()
         self.label_title.setText(f"{ref.artist()} - {ref.title()}")
         self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
-        self.audio_path = ref.audio()
+        self.audio_path = f"{song_path}/{ref.audio()}"
 
-        audio = WAVE(self.audio_path)
-        self.length = int(audio.info.length * 1000) #Extract the length in ms of the mapset's audio.
+        with audio_open(self.audio_path) as f:
+            self.length = int(f.duration * 1000) #Extract the length in ms of the mapset's audio.
+
+        self.plot.set_axisx(self.length)
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
@@ -261,36 +270,41 @@ class SongWindow(QWidget):
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
         self.sample_interval = self.smoothing ** (2/3)
 
-        # Implement code to visually smooth the graph
+        for diff in self.diff_list.items():
+            diff.process_density()
 
-    def calculate_density(self, smoothing, interval):
-        """Calculate the series for 'Absolute Density' and 'Hand Balance'."""
+        self.plot.update_plots("Absolute Density", self.diff_list.selectedItems())
+
+    def duration(self) -> int:
+        """Returns the song length in ms"""
+
+        return self.length
 
 class DiffItem(QListWidgetItem):
     """Defines a QCheckBox that also stores a Difficulty and graph series."""
 
-    def __init__(self, parent, diff: Difficulty):
+    def __init__(self, parent: QListWidget, diff: Difficulty):
         super().__init__(parent)
 
+        self._parent = parent
         self._difficulty = diff
         self._name = diff.name()
         self.setText(diff.name())
         font = QFont("Nunito", 8)
         font.setBold(True)
         self.setFont(font)
+        self._difficulty.calculate_master()
 
-        #Each series is a list of tuples of the format (Timestamp, Strain per second)
-        #Strain per second could mean NPS or occurances per second of some pattern type.
         self.series = {
-            "Absolute Density" : [],
-            "Hand Balance" : [],
-            #"LN Density" : [],
-            #"LN Hand Balance" : [],
-            #"RC Density" : [],
-            #"RC Hand Balance" : [],
-            #"Jack Intensity" : [],
-            #"Jack Hand Balance" : [],
-            #"Asynchronous Releases" : []
+            "Absolute Density" : { "timestamps" : [], "values" : []},
+            "Hand Balance" : { "timestamps" : [], "values" : []},
+            #"LN Density" : { "timestamps" : [], "values" : []},
+            #"LN Hand Balance" : { "timestamps" : [], "values" : []},
+            #"RC Density" : { "timestamps" : [], "values" : []},
+            #"RC Hand Balance" : { "timestamps" : [], "values" : []},
+            #"Jack Intensity" : { "timestamps" : [], "values" : []},
+            #"Jack Hand Balance" : { "timestamps" : [], "values" : []},
+            #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
         }
 
     def difficulty(self) -> Difficulty:
@@ -303,16 +317,74 @@ class DiffItem(QListWidgetItem):
 
         return self._name
 
+    def process_density(self, smoothing: int, interval: int):
+        """Calculate the series for 'Absolute Density' and 'Hand Balance'."""
+
+        data = self._difficulty.data["density"]
+        ad_times = self.series["Absolute Density"]["timestamps"]
+        ad_values = self.series["Absolute Density"]["values"]
+        hb_times = self.series["Hand Balance"]["timestamps"]
+        hb_values = self.series["Hand Balance"]["values"]
+
+        t = 0
+        max_ = self._parent.parent().duration() + 2 * smoothing
+        while t < max_:
+            #Find indices only with strain points within the rolling average window
+            indices = [i for i, val in enumerate(data["timestamps"]) if val >= t - smoothing and val <= t + smoothing]
+            total = sum([data["strains"][i] for i in indices])
+            #Get the notes (strain) per second of this window
+            nps = total / (2 * smoothing + 1)
+            #Strain in the middle column counts for both hands
+            l_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.LEFT or data["hands"][i] == Hand.AMBI])
+            r_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI])
+            #This variable has the range [0,inf]
+            ratio = -1 if l_total == 0 else r_total / l_total
+            #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
+            balance = -1 if ratio == -1 else 1 - (2 / (ratio + 1))
+
+            ad_times.append(t)
+            ad_values.append(nps)
+            hb_times.append(t)
+            hb_values.append(balance)
+
+            t = t + interval
+
 class MapPlotWidget(QWidget):
     """Specialized widget with embedded MatPlotLib Plot for this application."""
 
     def __init__(self, parent=None):
         super(MapPlotWidget, self).__init__(parent)
 
-        fig = Figure()
-        #ax = fig.add_subplot(111)
-        #ax.plot([1, 2, 3], [1, 2, 3])
+        self.fig = Figure()
+        self.ax = self.fig.add_subplot(111)
+        self.ax.set(xlim=(0,10),ylim=(0,10))
+        #self.ax.plot([1, 2, 3], [1, 2, 3])
 
         layout = QVBoxLayout(self)
-        self.canvas = FigureCanvas(fig)
+        self.canvas = FigureCanvas(self.fig)
         layout.addWidget(self.canvas)
+
+    def set_axisx(self, lim: int):
+        """Set x axis from 0 to lim"""
+        self.ax.set(xlim=(0,lim))
+        self.fig.canvas.draw()
+
+    def set_axisy(self, lim: int):
+        """Set y axis from 0 to lim"""
+        self.ax.set(ylim=(0,lim))
+        self.fig.canvas.draw()
+
+    def update_plots(self, key: str, diffs: list[DiffItem]):
+        """
+        key is one of the keys in the DiffItem.series dicts.
+        *series should be DiffItem.series dicts. Plots all info contained.
+        """
+
+        print(diffs[0].difficulty().notes())
+
+        self.ax.cla()
+        for data in [diff.series for diff in diffs]:
+            x = data[key]["timestamps"]
+            y = data[key]["values"]
+            self.ax.plot(x,y)
+        self.fig.canvas.draw()

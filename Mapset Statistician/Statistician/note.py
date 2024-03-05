@@ -22,7 +22,7 @@ class Note:
         self._hand = hand
 
     @classmethod
-    def from_parser(cls, line, keymode):
+    def from_dot_osu(cls, line, keymode):
         """Class method made specifically for the Parser object"""
 
         l = line.split(',')

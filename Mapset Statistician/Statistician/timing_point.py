@@ -18,7 +18,7 @@ class TimingPoint:
         self._effects = int(effects)
 
     @classmethod
-    def from_parser(cls, line):
+    def from_dot_osu(cls, line):
         """Classmethod made specifically for the Parser."""
 
         l = line.split(',')
@@ -32,7 +32,7 @@ class TimingPoint:
         """Return True if timing point is inherited."""
 
         return not self._uninherited
-    
+
     def time(self) -> int:
         """Return the timestamp of the timing point."""
 
@@ -42,7 +42,7 @@ class TimingPoint:
         """Return the beat length (inverse BPM) in ms."""
 
         return self._beat_length
-    
+
     def bpm(self) -> float:
         """Return the BPM of the timing point."""
 
@@ -52,15 +52,3 @@ class TimingPoint:
         """Return the meter (beats per bar)"""
 
         return self._meter
-
-'''
-    #Useless functions that I havent defined yet.
-
-    def sample_set(self) -> int:
-
-    def sample_index(self) -> int:
-
-    def volume(self) -> int:
-
-    def effects(self) -> int:
-'''

@@ -2,29 +2,83 @@
 
 from Statistician.note import Note
 from Statistician.timing_point import TimingPoint
-from Statistician.graph_data import RawGraphData
 
 class Difficulty:
     """Represents a difficulty in a mapset."""
 
-    def __init__(self):
-        self._note_list = []
-        self._timing_list = []
-        self._name = ''
-        self._keymode = -1
-        self._artist = ''
-        self._title = ''
-        self._host = ''
-        self._audio = ''
+    def __init__(self, notes: list[Note], times: list[TimingPoint], name: str,
+                 keymode: int, artist: str, title: str, host: str, audio: str):
+        self._note_list = notes
+        self._timing_list = times
+        self._name = name
+        self._keymode = keymode
+        self._artist = artist
+        self._title = title
+        self._host = host
+        self._audio = audio
 
         self.data = { #Initially empty RawGraphData containers for the various stats to display
-            "density"       : RawGraphData("Absolute Density")
-            #"ln_density"   : RawGraphData("LN Density")      #Total LN-only density
-            #"rc_density"   : RawGraphData("Rice Density")    #Total RC-only density
-            #"jacks"        : RawGraphData("Jack Intensity")  #Stacks below threshold count as jacks
-            #"asynch"       : RawGraphData("Asynch Releases") #Simple count of asynchronous releases
-            #"hybridness"   : RawGraphData("Hybridness")      #RC intensity scaled by concurrent LNs
+            "density"       : {"timestamps" : [], "strains" : [], "hands" : []}
+            #"ln_density"   :
+            #"rc_density"   :
+            #"jacks"        :
+            #"asynch"       :
+            #"hybridness"   :
         }
+
+    @classmethod
+    def from_path(cls, diff_path: str):
+        """
+        Initialize a Difficulty object from the .osu file of a difficulty.
+        Takes the full path to a .osu difficulty as a string.
+        """
+
+        with open(diff_path, 'r', encoding='utf8') as f:
+            timing = False
+            mapping = False
+            for line in f.readlines():
+                if 'Version' in line:
+                    name = line[8:-1]
+
+                elif 'CircleSize' in line:
+                    keymode = int(line[11:-1])
+
+                elif 'Title:' in line:
+                    title = line[6:-1]
+
+                elif 'Artist:' in line:
+                    artist = line[7:-1]
+
+                elif 'Creator:' in line:
+                    host = line[8:-1]
+
+                elif "AudioFilename:" in line:
+                    audio = line[15:-1]
+
+                elif "[TimingPoints]" in line:
+                    break
+
+            timings = []
+            notes = []
+
+            for line in f.readlines():
+                if "[TimingPoints]" in line:
+                    timing = True
+                    mapping = False
+
+                elif "[HitObjects]" in line:
+                    timing = False
+                    mapping = True
+
+                elif timing and "," in line:
+                    point = TimingPoint.from_dot_osu(line[0:-1])
+                    timings.append(point)
+
+                elif mapping and "," in line:
+                    note = Note.from_dot_osu(line[0:-1], keymode)
+                    notes.append(note)
+
+            return cls(notes, timings, name, keymode, artist, title, host, audio)
 
     def __repr__(self) -> str:
         return f"[{self._name}]"
@@ -38,6 +92,23 @@ class Difficulty:
         """Returns the list of all notes."""
 
         return self._note_list
+
+    def calculate_master(self):
+        """Calls all the calculate_x methods"""
+
+        self.calculate_density()
+
+    def calculate_density(self):
+        """Populate the 'density' item in self.data"""
+        print(self._note_list)
+
+        for note in self._note_list:
+            timestamp = note.time_start()
+            value = 1
+            hand = note.hand()
+            self.data["density"]["timestamps"].append(timestamp)
+            self.data["density"]["strains"].append(value)
+            self.data["density"]["hands"].append(hand)
 
     def add_timing_point(self, time_point: TimingPoint):
         """Adds a Note object to self.note_list."""
