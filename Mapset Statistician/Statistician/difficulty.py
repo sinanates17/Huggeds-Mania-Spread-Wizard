@@ -17,7 +17,7 @@ class Difficulty:
         self._host = host
         self._audio = audio
 
-        self.data = { #Initially empty RawGraphData containers for the various stats to display
+        self.data = {
             "density"       : {"timestamps" : [], "strains" : [], "hands" : []}
             #"ln_density"   :
             #"rc_density"   :
@@ -36,7 +36,8 @@ class Difficulty:
         with open(diff_path, 'r', encoding='utf8') as f:
             timing = False
             mapping = False
-            for line in f.readlines():
+            lines = f.readlines()
+            for line in lines:
                 if 'Version' in line:
                     name = line[8:-1]
 
@@ -61,7 +62,7 @@ class Difficulty:
             timings = []
             notes = []
 
-            for line in f.readlines():
+            for line in lines:
                 if "[TimingPoints]" in line:
                     timing = True
                     mapping = False
@@ -100,7 +101,6 @@ class Difficulty:
 
     def calculate_density(self):
         """Populate the 'density' item in self.data"""
-        print(self._note_list)
 
         for note in self._note_list:
             timestamp = note.time_start()

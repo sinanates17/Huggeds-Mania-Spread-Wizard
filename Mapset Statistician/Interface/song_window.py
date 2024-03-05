@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, 
 from audioread import audio_open
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-
 from Statistician.difficulty import Difficulty
 from Statistician.note import Hand
 
@@ -23,8 +22,8 @@ class SongWindow(QWidget):
 
         self.diff_checkboxes = []
         self.widgets = []
-        self.smoothing = 150 #+- time in ms to take a rolling average in the diff plots.
-        self.sample_interval = 28 # Every x ms, sample the raw data to calculate a rolling average.
+        self.smoothing = 400 #+- time in ms to take a rolling average in the diff plots.
+        self.sample_interval = 54 # Every x ms, sample the raw data to calculate a rolling average.
                                   #     Scales with smoothing to alleviate computational load.
         self.audio_path = ''
         self.length = 0
@@ -183,7 +182,7 @@ class SongWindow(QWidget):
 
         self.smoothing_slider.setMinimum(50)
         self.smoothing_slider.setMaximum(811)
-        self.smoothing_slider.setValue(150)
+        self.smoothing_slider.setValue(400)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
         self.smoothing_slider.setGeometry(270, 840, 800, 40)
         self.smoothing_slider.setStyleSheet(
@@ -249,7 +248,6 @@ class SongWindow(QWidget):
             if f.endswith(".osu"):
                 diff = Difficulty.from_path(f"{song_path}/{f}")
                 box = DiffItem(self.diff_list, diff)
-                box.process_density(self.smoothing, self.sample_interval) #Temporarily here until I add support to select which graph to show
                 self.diff_checkboxes.append(box)
                 self.diff_list.addItem(box)
 
@@ -261,6 +259,9 @@ class SongWindow(QWidget):
         with audio_open(self.audio_path) as f:
             self.length = int(f.duration * 1000) #Extract the length in ms of the mapset's audio.
 
+        for box in self.diff_checkboxes:
+            box.process_density(self.smoothing, self.sample_interval, self.length) #Temporarily here until I add support to select which graph to show
+
         self.plot.set_axisx(self.length)
 
     def change_smoothing(self, v):
@@ -268,10 +269,10 @@ class SongWindow(QWidget):
 
         self.smoothing = v if v <= 500 else (490 + 10*(v-500) if v <= 650 else 1950 + 50*(v-650))
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
-        self.sample_interval = self.smoothing ** (2/3)
+        self.sample_interval = self.smoothing / 3#self.smoothing ** (2/3)
 
-        for diff in self.diff_list.items():
-            diff.process_density()
+        for diff in self.diff_checkboxes:
+            diff.process_density(self.smoothing, self.sample_interval, self.length)
 
         self.plot.update_plots("Absolute Density", self.diff_list.selectedItems())
 
@@ -307,6 +308,21 @@ class DiffItem(QListWidgetItem):
             #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
         }
 
+    def empty_series(self) -> dict:
+        """Simply returns an empty series for use in changing smoothing."""
+
+        self.series = {
+            "Absolute Density" : { "timestamps" : [], "values" : []},
+            "Hand Balance" : { "timestamps" : [], "values" : []},
+            #"LN Density" : { "timestamps" : [], "values" : []},
+            #"LN Hand Balance" : { "timestamps" : [], "values" : []},
+            #"RC Density" : { "timestamps" : [], "values" : []},
+            #"RC Hand Balance" : { "timestamps" : [], "values" : []},
+            #"Jack Intensity" : { "timestamps" : [], "values" : []},
+            #"Jack Hand Balance" : { "timestamps" : [], "values" : []},
+            #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
+        }
+
     def difficulty(self) -> Difficulty:
         """Returns the object's Difficulty."""
 
@@ -317,28 +333,34 @@ class DiffItem(QListWidgetItem):
 
         return self._name
 
-    def process_density(self, smoothing: int, interval: int):
+    def process_density(self, smoothing: int, interval: int, length: int):
         """Calculate the series for 'Absolute Density' and 'Hand Balance'."""
 
         data = self._difficulty.data["density"]
+
+        self.empty_series()
         ad_times = self.series["Absolute Density"]["timestamps"]
         ad_values = self.series["Absolute Density"]["values"]
         hb_times = self.series["Hand Balance"]["timestamps"]
         hb_values = self.series["Hand Balance"]["values"]
 
         t = 0
-        max_ = self._parent.parent().duration() + 2 * smoothing
+        max_ = length + 2 * smoothing
         while t < max_:
             #Find indices only with strain points within the rolling average window
             indices = [i for i, val in enumerate(data["timestamps"]) if val >= t - smoothing and val <= t + smoothing]
             total = sum([data["strains"][i] for i in indices])
+
             #Get the notes (strain) per second of this window
-            nps = total / (2 * smoothing + 1)
+            nps = (total / (2 * smoothing + 1)) * 1000
+
             #Strain in the middle column counts for both hands
             l_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.LEFT or data["hands"][i] == Hand.AMBI])
             r_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI])
+
             #This variable has the range [0,inf]
             ratio = -1 if l_total == 0 else r_total / l_total
+
             #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
             balance = -1 if ratio == -1 else 1 - (2 / (ratio + 1))
 
@@ -379,8 +401,6 @@ class MapPlotWidget(QWidget):
         key is one of the keys in the DiffItem.series dicts.
         *series should be DiffItem.series dicts. Plots all info contained.
         """
-
-        print(diffs[0].difficulty().notes())
 
         self.ax.cla()
         for data in [diff.series for diff in diffs]:
