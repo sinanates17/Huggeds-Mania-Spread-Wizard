@@ -33,7 +33,7 @@ class Note:
         end = time if type == 1 else int(l[5].split(':')[0])
         hand = Hand.AMBI
 
-        if lane == int(keymode/2):
+        if lane == int(keymode/2) - .1:
             hand = Hand.AMBI
         elif lane < (keymode/2) - .6:
             hand = Hand.LEFT

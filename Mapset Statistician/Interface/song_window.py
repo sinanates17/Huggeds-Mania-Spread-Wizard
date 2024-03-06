@@ -32,6 +32,7 @@ class SongWindow(QWidget):
         self.diff_list = QListWidget(self)
         self.plot_list = QListWidget(self)
         self.label_diff = QLabel("Select difficulties\nto compare", self)
+        self.label_plot = QLabel("Select what\nto compare", self)
         self.smoothing_slider = QSlider(Qt.Horizontal, self)
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
         self.plot = MapPlotWidget(self)
@@ -62,13 +63,50 @@ class SongWindow(QWidget):
             """)
         self.widgets.append(self.label_creator)
 
+        scroll_bar1 = QScrollBar(self)
+        scroll_bar1.setStyleSheet("""
+            QScrollBar {
+                border: none;
+                background-color: #2a2a2a;
+                width: 10px;
+                margin: 0px 0px 0px 0px;
+            }
+            
+            QScrollBar::handle {
+                background-color: #dddddd;
+                min-height: 20px;
+                border-radius: 5px;
+            }
+            
+            QScrollBar::add-line{
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::sub-line {
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::add-page, QScrollBar::sub-page {
+                background: none;
+            }
+            """)
+
         self.plot_list.setFocusPolicy(Qt.NoFocus)
         self.plot_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.plot_list.setVerticalScrollBar(scroll_bar1)
+        self.plot_list.setLayoutDirection(Qt.RightToLeft)
         self.plot_list.setWordWrap(True)
         self.plot_list.setGeometry(1090, 575, 180, 305)
         self.plot_list.itemSelectionChanged.connect(
-            lambda: self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems()
-            )
+            self.process_key
         )
 
         self.plot_list.setStyleSheet("""
@@ -136,19 +174,55 @@ class SongWindow(QWidget):
         plot_font = QFont("Nunito", 8)
         plot_font.setBold(True)
         items = []
-        for key in ["Absolute Density", "Hand Balance"]:
+        for key in ["Absolute Density", "Hand Balance", "RC Density", "RC Balance", "LN Density", "LN Balance", "RC/LN Balance"]:
             item = QListWidgetItem(key)
             item.setFont(plot_font)
+            #item.setTextAlignment(Qt.AlignLeft)
             self.plot_list.addItem(item)
             items.append(item)
         self.plot_list.setCurrentItem(items[0])
+
+        scroll_bar2 = QScrollBar(self)
+        scroll_bar2.setStyleSheet("""
+            QScrollBar {
+                border: none;
+                background-color: #2a2a2a;
+                width: 10px;
+                margin: 0px 0px 0px 0px;
+            }
+            
+            QScrollBar::handle {
+                background-color: #dddddd;
+                min-height: 20px;
+                border-radius: 5px;
+            }
+            
+            QScrollBar::add-line{
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::sub-line {
+                border: none;
+                background: none;
+                height: 0px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+            
+            QScrollBar::add-page, QScrollBar::sub-page {
+                background: none;
+            }
+            """)
 
         self.diff_list.setSelectionMode(QAbstractItemView.MultiSelection)
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.diff_list.itemSelectionChanged.connect(
-            lambda: self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems()
-            )
+            self.process_key
         )
         self.diff_list.setWordWrap(True)
         self.diff_list.setGeometry(30, 575, 180, 305)
@@ -211,42 +285,7 @@ class SongWindow(QWidget):
                 background: none;
             }
             """)
-        scroll_bar = QScrollBar(self)
-        scroll_bar.setStyleSheet("""
-            QScrollBar {
-                border: none;
-                background-color: #2a2a2a;
-                width: 10px;
-                margin: 0px 0px 0px 0px;
-            }
-            
-            QScrollBar::handle {
-                background-color: #dddddd;
-                min-height: 20px;
-                border-radius: 5px;
-            }
-            
-            QScrollBar::add-line{
-                border: none;
-                background: none;
-                height: 0px;
-                subcontrol-position: bottom;
-                subcontrol-origin: margin;
-            }
-            
-            QScrollBar::sub-line {
-                border: none;
-                background: none;
-                height: 0px;
-                subcontrol-position: top;
-                subcontrol-origin: margin;
-            }
-            
-            QScrollBar::add-page, QScrollBar::sub-page {
-                background: none;
-            }
-            """)
-        self.diff_list.setVerticalScrollBar(scroll_bar)
+        self.diff_list.setVerticalScrollBar(scroll_bar2)
         self.diff_list.hide()
         self.widgets.append(self.diff_list)
 
@@ -260,11 +299,20 @@ class SongWindow(QWidget):
         self.label_diff.hide()
         self.widgets.append(self.label_diff)
 
+        self.label_plot.setFont(diff_font)
+        self.label_plot.setAlignment(Qt.AlignCenter)
+        self.label_plot.setGeometry(1090, 515, 180, 60)
+        self.label_plot.setStyleSheet("""
+            color: #888888
+            """)
+        self.label_plot.hide()
+        self.widgets.append(self.label_plot)
+
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
         self.smoothing_slider.setValue(15)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
-        self.smoothing_slider.setGeometry(270, 840, 800, 40)
+        self.smoothing_slider.setGeometry(240, 840, 820, 40)
         self.smoothing_slider.setStyleSheet(
             """
             QSlider::groove:horizontal {
@@ -284,7 +332,7 @@ class SongWindow(QWidget):
         self.widgets.append(self.smoothing_slider)
 
         self.label_smoothing.setFont(diff_font)
-        self.label_smoothing.setGeometry(270, 800, 800, 40)
+        self.label_smoothing.setGeometry(240, 800, 820, 40)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
         self.label_smoothing.setStyleSheet("""
             color: #888888
@@ -346,8 +394,7 @@ class SongWindow(QWidget):
             with audio_open(self.audio_path) as f:
                 self.length = int(f.duration * 1000) #Extract the length in ms of the mapset's audio.
 
-            for box in self.diff_checkboxes:
-                box.process_density(self.smoothing, self.sample_interval, self.length) #Temporarily here until I add support to select which graph to show
+            self.process_key()
 
             self.plot.set_axisx(0, self.length)
 
@@ -358,8 +405,7 @@ class SongWindow(QWidget):
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
         self.sample_interval = self.smoothing / 2.5 #self.smoothing ** (2/3)
 
-        for diff in self.diff_checkboxes:
-            diff.process_density(self.smoothing, self.sample_interval, self.length)
+        self.process_key()
 
         self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
 
@@ -367,3 +413,33 @@ class SongWindow(QWidget):
         """Returns the song length in ms"""
 
         return self.length
+
+    def process_key(self):
+        """Figure out which process method to call then update plot."""
+
+        key = key = self.plot_list.currentItem().text()
+
+        for diff in self.diff_checkboxes:
+            match key:
+                case "Absolute Density":
+                    diff.process_density(self.smoothing, self.sample_interval, self.length)
+
+                case "Hand Balance":
+                    diff.process_density(self.smoothing, self.sample_interval, self.length)
+
+                case "RC Density":
+                    diff.process_rc_density(self.smoothing, self.sample_interval, self.length)
+
+                case "RC Balance":
+                    diff.process_rc_density(self.smoothing, self.sample_interval, self.length)
+
+                case "LN Density":
+                    diff.process_ln_density(self.smoothing, self.sample_interval, self.length)
+
+                case "LN Balance":
+                    diff.process_ln_density(self.smoothing, self.sample_interval, self.length)
+
+                case "RC/LN Balance":
+                    diff.process_rcln_balance(self.smoothing, self.sample_interval, self.length)
+
+        self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())

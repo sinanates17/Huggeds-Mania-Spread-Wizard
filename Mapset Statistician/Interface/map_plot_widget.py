@@ -61,8 +61,26 @@ class MapPlotWidget(QWidget):
                 self.ax.set_ylabel("NPS")
 
             case "Hand Balance":
-                self.set_axisy(-1,1)
-                self.ax.set_ylabel("Bias")
+                self.set_axisy(-1.1,1.1)
+                self.ax.set_ylabel("Hand Bias")
+
+            case "RC Density":
+                self.ax.set_ylabel("NPS")
+
+            case "RC Balance":
+                self.set_axisy(-1.1,1.1)
+                self.ax.set_ylabel("Hand Bias")
+
+            case "LN Density":
+                self.ax.set_ylabel("NPS")
+
+            case "LN Balance":
+                self.set_axisy(-1.1,1.1)
+                self.ax.set_ylabel("Hand Bias")
+
+            case "RC/LN Balance":
+                self.set_axisy(-1.1,1.1)
+                self.ax.set_ylabel("RC/LN Bias")
 
         if len(diffs) > 0:
             self.set_axisx(0, diffs[0].max_ / 1000) #Set x axes strinctly from 0 to the map length in s.

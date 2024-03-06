@@ -18,9 +18,9 @@ class Difficulty:
         self._audio = audio
 
         self.data = {
-            "density"       : {"timestamps" : [], "strains" : [], "hands" : []}
-            #"ln_density"   :
-            #"rc_density"   :
+            "density"       : {"timestamps" : [], "strains" : [], "hands" : []},
+            "ln_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
+            "rc_density"    : {"timestamps" : [], "strains" : [], "hands" : []}
             #"jacks"        :
             #"asynch"       :
             #"hybridness"   :
@@ -34,7 +34,7 @@ class Difficulty:
         """
 
         with open(diff_path, 'r', encoding='utf8') as f:
-            timing = False
+            #timing = False
             mapping = False
             lines = f.readlines()
             for line in lines:
@@ -101,7 +101,7 @@ class Difficulty:
         self.calculate_density()
 
     def calculate_density(self):
-        """Populate the 'density' item in self.data"""
+        """Populate the 'density', 'rc_density', and 'ln_density', items in self.data"""
 
         for note in self._note_list:
             timestamp = note.time_start()
@@ -110,6 +110,16 @@ class Difficulty:
             self.data["density"]["timestamps"].append(timestamp)
             self.data["density"]["strains"].append(value)
             self.data["density"]["hands"].append(hand)
+
+            if note.is_rice():
+                self.data["rc_density"]["timestamps"].append(timestamp)
+                self.data["rc_density"]["strains"].append(value)
+                self.data["rc_density"]["hands"].append(hand)
+
+            elif not note.is_rice():
+                self.data["ln_density"]["timestamps"].append(timestamp)
+                self.data["ln_density"]["strains"].append(value)
+                self.data["ln_density"]["hands"].append(hand)
 
     def add_timing_point(self, time_point: TimingPoint):
         """Adds a Note object to self.note_list."""
