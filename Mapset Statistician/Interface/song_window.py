@@ -65,7 +65,7 @@ class SongWindow(QWidget):
         self.plot_list.setFocusPolicy(Qt.NoFocus)
         self.plot_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.plot_list.setWordWrap(True)
-        self.plot_list.setGeometry(1090, 560, 180, 320)
+        self.plot_list.setGeometry(1090, 575, 180, 305)
         self.plot_list.itemSelectionChanged.connect(
             lambda: self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems()
             )
@@ -151,7 +151,7 @@ class SongWindow(QWidget):
             )
         )
         self.diff_list.setWordWrap(True)
-        self.diff_list.setGeometry(30, 560, 180, 320)
+        self.diff_list.setGeometry(30, 575, 180, 305)
         self.diff_list.setStyleSheet("""
             QListWidget {
                 border-radius: 10px;
@@ -253,7 +253,7 @@ class SongWindow(QWidget):
         diff_font = QFont("Nunito",16)
         self.label_diff.setFont(diff_font)
         self.label_diff.setAlignment(Qt.AlignCenter)
-        self.label_diff.setGeometry(30, 500, 180, 60)
+        self.label_diff.setGeometry(30, 515, 180, 60)
         self.label_diff.setStyleSheet("""
             color: #888888
             """)
@@ -292,7 +292,7 @@ class SongWindow(QWidget):
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
 
-        self.plot.setGeometry(30,160,1240,310)
+        self.plot.setGeometry(-80,110,1460,420)#310)
         self.plot.hide()
         self.widgets.append(self.plot)
 
@@ -349,7 +349,7 @@ class SongWindow(QWidget):
             for box in self.diff_checkboxes:
                 box.process_density(self.smoothing, self.sample_interval, self.length) #Temporarily here until I add support to select which graph to show
 
-            self.plot.set_axisx(self.length)
+            self.plot.set_axisx(0, self.length)
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""

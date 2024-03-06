@@ -20,6 +20,7 @@ class DiffItem(QListWidgetItem):
         font.setBold(True)
         self.setFont(font)
         self._difficulty.calculate_master()
+        self.max_ = 0
 
         self.series = {
             "Absolute Density" : { "timestamps" : [], "values" : []},
@@ -70,8 +71,8 @@ class DiffItem(QListWidgetItem):
         hb_values = self.series["Hand Balance"]["values"]
 
         t = 0
-        max_ = length + 2 * smoothing
-        while t < max_:
+        self.max_ = length
+        while t < self.max_:
             #Find indices only with strain points within the rolling average window
             indices = [i for i, val in enumerate(data["timestamps"]) if val >= t - smoothing and val <= t + smoothing]
             total = sum([data["strains"][i] for i in indices])
@@ -84,14 +85,14 @@ class DiffItem(QListWidgetItem):
             r_total = sum([data["strains"][i] for i in indices if data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI])
 
             #This variable has the range [0,inf]
-            ratio = r_total / .001 if l_total == 0 else r_total / l_total
+            ratio = 1 if l_total == 0 and r_total == 0 else (r_total / .001 if l_total == 0 else r_total / l_total)
 
             #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
             balance = 1 - (2 / (ratio + 1))
 
-            ad_times.append(t)
+            ad_times.append(t/1000)
             ad_values.append(nps)
-            hb_times.append(t)
+            hb_times.append(t/1000)
             hb_values.append(balance)
 
             t = t + interval
