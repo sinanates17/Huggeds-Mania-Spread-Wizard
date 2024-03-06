@@ -64,7 +64,7 @@ class Difficulty:
 
             for line in lines:
                 if "[TimingPoints]" in line:
-                    timing = True
+                    #timing = True
                     mapping = False
 
                 elif "[HitObjects]" in line:
