@@ -56,6 +56,8 @@ class MapPlotWidget(QWidget):
             y = data[key]["values"]
             self.ax.plot(x,y)
 
+        self.ax.set_title(key, color='white')
+
         match key:
             case "Absolute Density":
                 self.ax.set_ylabel("NPS")
@@ -88,6 +90,9 @@ class MapPlotWidget(QWidget):
             case "Jack Balance":
                 self.set_axisy(-1.1,1.1)
                 self.ax.set_ylabel("Hand Bias")
+
+            case "Asynchronous Releases":
+                self.ax.set_ylabel("Strain")
 
         if len(diffs) > 0:
             self.set_axisx(0, diffs[0].max_ / 1000) #Set x axes strinctly from 0 to the map length in s.

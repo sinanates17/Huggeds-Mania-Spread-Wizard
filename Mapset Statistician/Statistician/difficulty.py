@@ -102,6 +102,7 @@ class Difficulty:
 
         self.calculate_density()
         self.calculate_jacks()
+        self.calculate_releases()
 
     def calculate_density(self):
         """Populate the 'density', 'rc_density', and 'ln_density', items in self.data"""
@@ -147,7 +148,7 @@ class Difficulty:
             timestamp = note.time_start()
             value = note.time_end()
             hand = note.hand()
-            
+
             self.data["asynch"]["timestamps"].append(timestamp)
             self.data["asynch"]["strains"].append(value)
             self.data["asynch"]["hands"].append(hand)

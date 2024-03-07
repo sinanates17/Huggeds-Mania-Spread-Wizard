@@ -272,8 +272,20 @@ class DiffItem(QListWidgetItem):
 
             t = t + interval
 
-    def process_releases(self, smoothing: int, interval: int, length: int, threshold: int, thresh_mode: bool):
+    def process_releases(self, smoothing: int, interval: int, length: int, threshold1: int, threshold2: int, thresh_mode: bool):
         "Calculate the series for 'Asynchronous Releases'."
+
+        #threshold1 is the minimum LN length to be considered an LN
+        #threshold2 is how many ms a release needs to be after an LN head or before an LN tail
+            #To be considered asynchronous
+
+        if thresh_mode:
+            thresh1 = threshold1
+            thresh2 = threshold2
+
+        else:
+            thresh1 = 1 #off-by-one tolerance just incase
+            thresh2 = 1
 
         data = self._difficulty.data["asynch"]
 
@@ -285,14 +297,21 @@ class DiffItem(QListWidgetItem):
         self.max_ = length
         while t < self.max_:
             #Find indices where the strain (release) release is within the rolling average window
-            strain_indices = [i for i, val in enumerate(data["strains"]) if val >= t - smoothing and val <= t + smoothing and
-                       data["strains"][i] >= data["timestamps"][i] + threshold]
+            release_times = [val for i, val in enumerate(data["strains"]) if val >= t - smoothing and val <= t + smoothing and
+                       val >= data["timestamps"][i] + thresh1]
                             #LNs shorter than threshold ms are not considered LNs
-            
+
             total_strain = 0
-            for i in strain_indices:
-                subtotal_strain = sum([1 for k, val in enumerate(data["timestamps"]) if 
-                                       data["strains"][i] >= data["timestamps"][k] + threshold and
-                                       data["strains"][i] <= data["strains"][k] - threshold]) #LEFT OFF HERE
+            for release in release_times:
+                subtotal_strain = sum([1 for k, val in enumerate(data["timestamps"]) if
+                                       release >= val + thresh2 and
+                                       release <= data["strains"][k] - thresh2 and
+                                       data["strains"][k] - val >= thresh1])
+                total_strain = total_strain + subtotal_strain
+
+            sps = (total_strain / (2 * smoothing + 1)) * 1000
+
+            times.append(t/1000)
+            values.append(sps)
 
             t = t + interval
