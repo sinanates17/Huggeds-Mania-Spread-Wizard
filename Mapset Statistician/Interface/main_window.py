@@ -3,6 +3,7 @@
 # pylint: disable=E0611
 
 from os import listdir, path
+import json
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import Qt
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
@@ -39,6 +40,21 @@ class MainWindow(QMainWindow):
         self.song_window.setGeometry(270, 60, 1300, 910)
         self.song_window.hide()
 
+        if "cache.json" not in listdir():
+            with open("cache.json", "x", encoding="utf8") as f:
+                data = {"folder_path": ""}
+                folder_path = json.dumps(data)
+                f.write(folder_path)
+        
+        with open("cache.json", "r", encoding="utf8") as f:
+            data = json.load(f)
+            if data["folder_path"] == "":
+                pass
+            else:
+                self.folder_button.folder_path = data["folder_path"]
+                self.refresh_songs()
+
+
     def refresh_songs(self):
         """Update the song select menu."""
 
@@ -46,6 +62,10 @@ class MainWindow(QMainWindow):
         self.song_list.show()
 
         self.folder_path = self.folder_button.folder_path
+        with open("cache.json", "w", encoding="utf8") as f:
+            data = {"folder_path": self.folder_path}
+            folder_path = json.dumps(data)
+            f.write(folder_path)
 
         if self.folder_path is None:
             pass
