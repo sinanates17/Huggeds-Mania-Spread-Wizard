@@ -444,7 +444,7 @@ class SongWindow(QWidget):
 
             self.process_key()
 
-            self.plot.set_axisx(0, self.length)
+            self.plot.set_axisx(0, self.length / 1000)
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
