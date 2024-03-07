@@ -46,8 +46,8 @@ class DiffItem(QListWidgetItem):
             "RC Density"       : { "timestamps" : [], "values" : []},
             "RC Balance"       : { "timestamps" : [], "values" : []},
             "RC/LN Balance"    : { "timestamps" : [], "values" : []},
-            #"Jack Intensity" : { "timestamps" : [], "values" : []},
-            #"Jack Hand Balance" : { "timestamps" : [], "values" : []},
+            "Jack Intensity"   : { "timestamps" : [], "values" : []},
+            "Jack Balance"     : { "timestamps" : [], "values" : []},
             #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
         }
 
@@ -203,5 +203,71 @@ class DiffItem(QListWidgetItem):
 
             rclnb_times.append(t/1000)
             rclnb_values.append(balance)
+
+            t = t + interval
+
+    def process_jacks(self, smoothing: int, interval: int, length: int, threshold: int, thresh_mode: bool):
+        """Calculate the series for 'Jack Intensity' and 'Jack Balance'."""
+
+        data = self._difficulty.data["jacks"]
+
+        self.empty_series()
+        j_times = self.series["Jack Intensity"]["timestamps"]
+        j_values = self.series["Jack Intensity"]["values"]
+        b_times = self.series["Jack Balance"]["timestamps"]
+        b_values = self.series["Jack Balance"]["values"]
+
+        t = 0
+        self.max_ = length
+        while t < self.max_:
+            #Find indices only with strain points within the rolling average window.
+            indices = [i for i, val in enumerate(data["timestamps"]) if val >= t - smoothing and val <= t + smoothing]
+
+            if thresh_mode: #When thresh_mode is True, only jacks within threshold ms are counted as jacks, with strains of 1
+                total = sum([1 for i in indices if data["strains"][i] <= threshold])
+                r_total = sum([1 for i in indices if data["strains"][i] <= threshold and
+                               data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI])
+                l_total = sum([1 for i in indices if data["strains"][i] <= threshold and
+                               data["hands"][i] == Hand.LEFT or data["hands"][i] == Hand.AMBI])
+
+                #strain per second = number of jacks within threshold per second
+                sps = (total / (2 * smoothing + 1)) * 1000
+
+                #This variable has the range [0,inf]
+                ratio = 1 if l_total == 0 and r_total == 0 else (r_total / .001 if l_total == 0 else r_total / l_total)
+
+                #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
+                balance = 1 - (2 / (ratio + 1))
+
+            else: #When thresh_mode is False, determine jack strain using a sigmoid curve
+                strain = []
+                l_strain = []
+                r_strain = []
+                mid = 168 #no. of ms where a jack has a strain of 1. 168 = 1/2 snap at 180BPM
+
+                for i in indices:
+                    value = data["strains"][i]
+                    strain.append(mid**2 / value**2) #1/4 minijack is 4x the strain as a 1/2 jack is 4x the strain as a 1/1 stack
+                    if data["hands"][i] == Hand.RIGHT or data["hands"][i] == Hand.AMBI:
+                        r_strain.append(mid**2 / value**2)
+
+                    if data["hands"][i] == Hand.LEFT or data["hands"][i] == Hand.AMBI:
+                        l_strain.append(mid**2 / value**2)
+
+                total = sum(strain)
+                r_total = sum(r_strain)
+                l_total = sum(l_strain)
+                sps = (total / (2 * smoothing + 1)) * 1000
+
+                ratio = 1 if l_total == 0 and r_total == 0 else (r_total / .001 if l_total == 0 else r_total / l_total)
+
+                #Transform it into a new value in the range [-1,1]... f(x) = 1 - (2 / (x+1))
+                balance = 1 - (2 / (ratio + 1))
+
+
+            j_times.append(t/1000)
+            j_values.append(sps)
+            b_times.append(t/1000)
+            b_values.append(balance)
 
             t = t + interval

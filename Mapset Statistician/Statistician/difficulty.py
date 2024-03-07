@@ -20,8 +20,8 @@ class Difficulty:
         self.data = {
             "density"       : {"timestamps" : [], "strains" : [], "hands" : []},
             "ln_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
-            "rc_density"    : {"timestamps" : [], "strains" : [], "hands" : []}
-            #"jacks"        :
+            "rc_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
+            "jacks"         : {"timestamps" : [], "strains" : [], "hands" : []}, #strains = ms since previous note in column
             #"asynch"       :
             #"hybridness"   :
         }
@@ -68,7 +68,7 @@ class Difficulty:
                     mapping = False
 
                 elif "[HitObjects]" in line:
-                    timing = False
+                    #timing = False
                     mapping = True
 
                 #Not using TimingPoints for now.
@@ -99,6 +99,7 @@ class Difficulty:
         """Calls all the calculate_x methods"""
 
         self.calculate_density()
+        self.calculate_jacks()
 
     def calculate_density(self):
         """Populate the 'density', 'rc_density', and 'ln_density', items in self.data"""
@@ -120,6 +121,22 @@ class Difficulty:
                 self.data["ln_density"]["timestamps"].append(timestamp)
                 self.data["ln_density"]["strains"].append(value)
                 self.data["ln_density"]["hands"].append(hand)
+
+    def calculate_jacks(self):
+        """Populate the 'jacks' item in self.data"""
+
+        last_note = [-10000 for i in range(self.keymode())]
+
+        for note in self._note_list:
+            timestamp = note.time_start()
+            value = timestamp - last_note[note.lane()]
+            hand = note.hand()
+
+            last_note[note.lane()] = timestamp
+
+            self.data["jacks"]["timestamps"].append(timestamp)
+            self.data["jacks"]["strains"].append(value)
+            self.data["jacks"]["hands"].append(hand)
 
     def add_timing_point(self, time_point: TimingPoint):
         """Adds a Note object to self.note_list."""

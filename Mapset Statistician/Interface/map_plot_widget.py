@@ -82,6 +82,13 @@ class MapPlotWidget(QWidget):
                 self.set_axisy(-1.1,1.1)
                 self.ax.set_ylabel("RC/LN Bias")
 
+            case "Jack Intensity":
+                self.ax.set_ylabel("Strain")
+
+            case "Jack Balance":
+                self.set_axisy(-1.1,1.1)
+                self.ax.set_ylabel("Hand Bias")
+
         if len(diffs) > 0:
             self.set_axisx(0, diffs[0].max_ / 1000) #Set x axes strinctly from 0 to the map length in s.
         self.ax.set_xlabel("Time")

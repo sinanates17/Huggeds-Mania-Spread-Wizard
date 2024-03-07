@@ -6,7 +6,7 @@ This module contains a class definition for SongWindow.
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider, QCheckBox
 from audioread import audio_open
 from Interface.map_plot_widget import MapPlotWidget
 from Interface.diff_item import DiffItem
@@ -23,6 +23,7 @@ class SongWindow(QWidget):
         self.smoothing = 1500 #+- time in ms to take a rolling average in the diff plots.
         self.sample_interval = 600 # Every x ms, sample the raw data to calculate a rolling average.
                                   #     Scales with smoothing to alleviate computational load.
+        self.threshold = 200 #Multi-use parameter depending on what graph is shown
         self.audio_path = ''
         self.length = 0
 
@@ -34,7 +35,10 @@ class SongWindow(QWidget):
         self.label_diff = QLabel("Select difficulties\nto compare", self)
         self.label_plot = QLabel("Select what\nto compare", self)
         self.smoothing_slider = QSlider(Qt.Horizontal, self)
+        self.threshold_slider = QSlider(Qt.Horizontal, self)
+        self.threshold_mode = QCheckBox(self)
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
+        self.label_threshold = QLabel(f"Threshold: {self.threshold}ms", self)
         self.plot = MapPlotWidget(self)
         self._init_ui()
 
@@ -174,10 +178,10 @@ class SongWindow(QWidget):
         plot_font = QFont("Nunito", 8)
         plot_font.setBold(True)
         items = []
-        for key in ["Absolute Density", "Hand Balance", "RC Density", "RC Balance", "LN Density", "LN Balance", "RC/LN Balance"]:
+        for key in ["Absolute Density", "Hand Balance", "RC Density", "RC Balance", "LN Density",
+                    "LN Balance", "RC/LN Balance", "Jack Intensity", "Jack Balance"]:
             item = QListWidgetItem(key)
             item.setFont(plot_font)
-            #item.setTextAlignment(Qt.AlignLeft)
             self.plot_list.addItem(item)
             items.append(item)
         self.plot_list.setCurrentItem(items[0])
@@ -331,6 +335,50 @@ class SongWindow(QWidget):
         self.smoothing_slider.hide()
         self.widgets.append(self.smoothing_slider)
 
+        self.threshold_slider.setMinimum(2)
+        self.threshold_slider.setMaximum(100)
+        self.threshold_slider.setValue(20)
+        self.threshold_slider.setStyleSheet(
+            """
+            QSlider::groove:horizontal {
+                background: #666666;
+                height: 40px;
+                border-radius: 20px;
+            }
+            QSlider::handle:horizontal {
+                background: #dddddd;
+                height: 40px;
+                width: 40px;
+                border-radius: 20px;
+            }
+            """
+        )
+        self.threshold_slider.setGeometry(240, 750, 820, 40)
+        self.threshold_slider.valueChanged.connect(self.change_threshold)
+        self.threshold_slider.hide()
+        self.widgets.append(self.threshold_slider)
+
+        self.label_threshold.setFont(diff_font)
+        self.label_threshold.setGeometry(240, 710, 820, 40)
+        self.label_threshold.setAlignment(Qt.AlignCenter)
+        self.label_threshold.setStyleSheet("""
+            color: #888888
+            """)
+        self.label_threshold.hide()
+        self.widgets.append(self.label_threshold)
+
+        self.threshold_mode.setFont(plot_font)
+        self.threshold_mode.setText("Threshold mode")
+        self.threshold_mode.setFont(diff_font)
+        self.threshold_mode.setGeometry(240, 650, 180, 60)
+        self.threshold_mode.stateChanged.connect(self.process_key)
+        self.threshold_mode.setStyleSheet("""
+            QCheckBox { background-color: none;
+                        color: #888888 }
+        """)
+        self.threshold_mode.hide()
+        self.widgets.append(self.threshold_mode)
+
         self.label_smoothing.setFont(diff_font)
         self.label_smoothing.setGeometry(240, 800, 820, 40)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
@@ -407,7 +455,14 @@ class SongWindow(QWidget):
 
         self.process_key()
 
-        self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
+    def change_threshold(self, v):
+        """Connected to the threshold slider."""
+
+        self.threshold = v * 10
+        self.label_threshold.setText(f"Threshold: {self.threshold}ms")
+
+        if self.threshold_mode.isChecked():
+            self.process_key()
 
     def duration(self) -> int:
         """Returns the song length in ms"""
@@ -441,5 +496,13 @@ class SongWindow(QWidget):
 
                 case "RC/LN Balance":
                     diff.process_rcln_balance(self.smoothing, self.sample_interval, self.length)
+
+                case "Jack Intensity":
+                    diff.process_jacks(self.smoothing, self.sample_interval, self.length,
+                                       self.threshold, self.threshold_mode.isChecked())
+
+                case "Jack Balance":
+                    diff.process_jacks(self.smoothing, self.sample_interval, self.length,
+                                       self.threshold, self.threshold_mode.isChecked())
 
         self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
