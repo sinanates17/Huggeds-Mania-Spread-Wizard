@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
                 data = {"folder_path": ""}
                 folder_path = json.dumps(data)
                 f.write(folder_path)
-        
+
         with open("cache.json", "r", encoding="utf8") as f:
             data = json.load(f)
             if data["folder_path"] == "":

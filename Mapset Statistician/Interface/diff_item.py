@@ -39,16 +39,16 @@ class DiffItem(QListWidgetItem):
         """Simply returns an empty series for use in changing smoothing."""
 
         self.series = {
-            "Absolute Density" : { "timestamps" : [], "values" : []},
-            "Hand Balance"     : { "timestamps" : [], "values" : []},
-            "LN Density"       : { "timestamps" : [], "values" : []},
-            "LN Balance"       : { "timestamps" : [], "values" : []},
-            "RC Density"       : { "timestamps" : [], "values" : []},
-            "RC Balance"       : { "timestamps" : [], "values" : []},
-            "RC/LN Balance"    : { "timestamps" : [], "values" : []},
-            "Jack Intensity"   : { "timestamps" : [], "values" : []},
-            "Jack Balance"     : { "timestamps" : [], "values" : []},
-            #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
+            "Absolute Density"      : { "timestamps" : [], "values" : []},
+            "Hand Balance"          : { "timestamps" : [], "values" : []},
+            "LN Density"            : { "timestamps" : [], "values" : []},
+            "LN Balance"            : { "timestamps" : [], "values" : []},
+            "RC Density"            : { "timestamps" : [], "values" : []},
+            "RC Balance"            : { "timestamps" : [], "values" : []},
+            "RC/LN Balance"         : { "timestamps" : [], "values" : []},
+            "Jack Intensity"        : { "timestamps" : [], "values" : []},
+            "Jack Balance"          : { "timestamps" : [], "values" : []},
+            "Asynchronous Releases" : { "timestamps" : [], "values" : []},
         }
 
     def difficulty(self) -> Difficulty:
@@ -269,5 +269,30 @@ class DiffItem(QListWidgetItem):
             j_values.append(sps)
             b_times.append(t/1000)
             b_values.append(balance)
+
+            t = t + interval
+
+    def process_releases(self, smoothing: int, interval: int, length: int, threshold: int, thresh_mode: bool):
+        "Calculate the series for 'Asynchronous Releases'."
+
+        data = self._difficulty.data["asynch"]
+
+        self.empty_series()
+        times = self.series["Asynchronous Releases"]["timestamps"]
+        values = self.series["Asynchronous Releases"]["values"]
+
+        t = 0
+        self.max_ = length
+        while t < self.max_:
+            #Find indices where the strain (release) release is within the rolling average window
+            strain_indices = [i for i, val in enumerate(data["strains"]) if val >= t - smoothing and val <= t + smoothing and
+                       data["strains"][i] >= data["timestamps"][i] + threshold]
+                            #LNs shorter than threshold ms are not considered LNs
+            
+            total_strain = 0
+            for i in strain_indices:
+                subtotal_strain = sum([1 for k, val in enumerate(data["timestamps"]) if 
+                                       data["strains"][i] >= data["timestamps"][k] + threshold and
+                                       data["strains"][i] <= data["strains"][k] - threshold]) #LEFT OFF HERE
 
             t = t + interval

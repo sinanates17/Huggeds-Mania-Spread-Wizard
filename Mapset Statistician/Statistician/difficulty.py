@@ -21,8 +21,10 @@ class Difficulty:
             "density"       : {"timestamps" : [], "strains" : [], "hands" : []},
             "ln_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
             "rc_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
-            "jacks"         : {"timestamps" : [], "strains" : [], "hands" : []}, #strains = ms since previous note in column
-            "asynch"        : {"timestamps" : [], "strains" : [], "hands" : []}  #strains = ln end time
+            "jacks"         : {"timestamps" : [], "strains" : [], "hands" : []}, 
+                #strains = ms since previous note in column
+            "asynch"        : {"timestamps" : [], "strains" : [], "hands" : []}  
+                #strains = ln end time
             #"hybridness"   :
         }
 
@@ -137,6 +139,18 @@ class Difficulty:
             self.data["jacks"]["timestamps"].append(timestamp)
             self.data["jacks"]["strains"].append(value)
             self.data["jacks"]["hands"].append(hand)
+
+    def calculate_releases(self):
+        """Populate the 'asynch' item in self.data"""
+
+        for note in self._note_list:
+            timestamp = note.time_start()
+            value = note.time_end()
+            hand = note.hand()
+            
+            self.data["asynch"]["timestamps"].append(timestamp)
+            self.data["asynch"]["strains"].append(value)
+            self.data["asynch"]["hands"].append(hand)
 
     def add_timing_point(self, time_point: TimingPoint):
         """Adds a Note object to self.note_list."""
