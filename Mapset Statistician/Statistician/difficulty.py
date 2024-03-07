@@ -22,7 +22,7 @@ class Difficulty:
             "ln_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
             "rc_density"    : {"timestamps" : [], "strains" : [], "hands" : []},
             "jacks"         : {"timestamps" : [], "strains" : [], "hands" : []}, #strains = ms since previous note in column
-            #"asynch"       :
+            "asynch"        : {"timestamps" : [], "strains" : [], "hands" : []}  #strains = ln end time
             #"hybridness"   :
         }
 
