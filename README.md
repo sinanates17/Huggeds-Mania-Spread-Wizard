@@ -20,7 +20,7 @@ The RC/LN Density options do the exact same thing as Absolute density, but only 
 Notes per second is calculated on each hand exactly as above, with the middle key in odd keymodes counting twice, once for each hand. The ratio of `Right strain:Left strain` is taken and transformed to fit in the range `[-1,1]`, such that:
   - `1` and `-1` correnpond to 100% right and left hand loading, respectively.
   - `0` corresponds to equal note density across both hands.
-  - `.2`, `.5` correnponds to and 60% and 75% right hand loading, respectively.
+  - `.2` and `.5` corresponds to and 60% and 75% right hand loading, respectively.
   - etc
 
 ### RC/LN Balance
