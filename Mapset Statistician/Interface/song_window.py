@@ -6,10 +6,11 @@ This module contains a class definition for SongWindow.
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QSlider, QCheckBox
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QCheckBox
 from audioread import audio_open
 from Interface.map_plot_widget import MapPlotWidget
 from Interface.diff_item import DiffItem
+from Interface.slider_unclickable import SliderUnclickable
 from Statistician.difficulty import Difficulty
 
 class SongWindow(QWidget):
@@ -35,14 +36,16 @@ class SongWindow(QWidget):
         self.plot_list = QListWidget(self)
         self.label_diff = QLabel("Select difficulties\nto compare", self)
         self.label_plot = QLabel("Select what\nto compare", self)
-        self.smoothing_slider = QSlider(Qt.Horizontal, self)
-        self.threshold_slider = QSlider(Qt.Horizontal, self)
-        self.threshold2_slider = QSlider(Qt.Horizontal, self)
+        self.smoothing_slider = SliderUnclickable(Qt.Horizontal, self)
+        self.threshold_slider = SliderUnclickable(Qt.Horizontal, self)
+        self.threshold2_slider = SliderUnclickable(Qt.Horizontal, self)
         self.threshold_mode = QCheckBox(self)
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
         self.label_threshold = QLabel(f"Threshold 1: {self.threshold}ms", self)
         self.label_threshold2 = QLabel(f"Threshold 2: {self.threshold}ms", self)
         self.plot = MapPlotWidget(self)
+        self.thresh1_desc = ""
+        self.thresh2_desc = ""
         self._init_ui()
 
     def _init_ui(self):
@@ -127,7 +130,7 @@ class SongWindow(QWidget):
             QListWidget::item {
                 background-color: #444444;
                 padding: 5px;
-                height: 40px;
+                height: 20px;
                 width: 148px;
                 margin: 2px;
                 border-radius: 5px;
@@ -244,7 +247,7 @@ class SongWindow(QWidget):
             QListWidget::item {
                 background-color: #444444;
                 padding: 5px;
-                height: 40px;
+                height: 20px;
                 width: 148px;
                 margin: 2px;
                 border-radius: 5px;
@@ -406,14 +409,15 @@ class SongWindow(QWidget):
         self.widgets.append(self.label_threshold2)
 
         self.threshold_mode.setFont(plot_font)
-        self.threshold_mode.setText("Threshold mode")
+        self.threshold_mode.setText("Alternate Calculator")
         self.threshold_mode.setFont(diff_font)
-        self.threshold_mode.setGeometry(240, 560, 180, 60)
+        self.threshold_mode.setGeometry(240, 560, 240, 60)
         self.threshold_mode.stateChanged.connect(self.process_key)
         self.threshold_mode.setStyleSheet("""
             QCheckBox { background-color: none;
                         color: #888888 }
         """)
+        self.threshold_mode.setChecked(True)
         self.threshold_mode.hide()
         self.widgets.append(self.threshold_mode)
 
@@ -491,14 +495,14 @@ class SongWindow(QWidget):
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
         self.sample_interval = self.smoothing / 2.5 #self.smoothing ** (2/3)
 
-    def change_threshold(self, v):
+    def change_threshold(self, v=None):
         """Connected to the threshold sliders."""
 
         self.threshold = self.threshold_slider.value() * 10
-        self.label_threshold.setText(f"Threshold 1: {self.threshold}ms")
+        self.label_threshold.setText(f"{self.thresh1_desc}: {self.threshold}ms")
 
         self.threshold2 = self.threshold2_slider.value() * 10
-        self.label_threshold2.setText(f"Threshold 2: {self.threshold2}ms")
+        self.label_threshold2.setText(f"{self.thresh2_desc}: {self.threshold2}ms")
 
     def duration(self) -> int:
         """Returns the song length in ms"""
@@ -514,35 +518,93 @@ class SongWindow(QWidget):
             match key:
                 case "Absolute Density":
                     diff.process_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "Hand Balance":
                     diff.process_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "RC Density":
                     diff.process_rc_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "RC Balance":
                     diff.process_rc_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "LN Density":
                     diff.process_ln_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "LN Balance":
                     diff.process_ln_density(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
                 case "RC/LN Balance":
                     diff.process_rcln_balance(self.smoothing, self.sample_interval, self.length)
+                    self.threshold_slider.hide()
+                    self.threshold2_slider.hide()
+                    self.label_threshold.hide()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.hide()
 
+                #pylint: disable=W0612
                 case "Jack Intensity":
                     diff.process_jacks(self.smoothing, self.sample_interval, self.length,
-                                       self.threshold, self.threshold_mode.isChecked())
+                                       self.threshold, not self.threshold_mode.isChecked())
+                    v = self.threshold_slider.hide() if self.threshold_mode.isChecked() else self.threshold_slider.show()
+                    self.threshold2_slider.hide()
+                    v = self.label_threshold.hide() if self.threshold_mode.isChecked() else self.label_threshold.show()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.show()
+                    self.thresh1_desc = "Max. Stack Distance"
+                    self.change_threshold()
 
                 case "Jack Balance":
                     diff.process_jacks(self.smoothing, self.sample_interval, self.length,
-                                       self.threshold, self.threshold_mode.isChecked())
+                                       self.threshold, not self.threshold_mode.isChecked())
+                    v = self.threshold_slider.hide() if self.threshold_mode.isChecked() else self.threshold_slider.show()
+                    self.threshold2_slider.hide()
+                    v = self.label_threshold.hide() if self.threshold_mode.isChecked() else self.label_threshold.show()
+                    self.label_threshold2.hide()
+                    self.threshold_mode.show()
+                    self.thresh1_desc = "Max. Stack Distance"
+                    self.change_threshold()
 
                 case "Asynchronous Releases":
                     diff.process_releases(self.smoothing, self.sample_interval, self.length,
-                                       self.threshold, self.threshold2, self.threshold_mode.isChecked())
+                                       self.threshold, self.threshold2)
+                    self.threshold_slider.show()
+                    self.threshold2_slider.show()
+                    self.label_threshold.show()
+                    self.label_threshold2.show()
+                    self.threshold_mode.hide()
+                    self.thresh1_desc = "Min. LN Length"
+                    self.thresh2_desc = "Overlap Tolerance"
+                    self.change_threshold()
 
         self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())

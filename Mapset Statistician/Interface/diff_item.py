@@ -23,20 +23,20 @@ class DiffItem(QListWidgetItem):
         self.max_ = 0
 
         self.series = {
-            "Absolute Density" : { "timestamps" : [], "values" : []},
-            "Hand Balance"     : { "timestamps" : [], "values" : []},
-            "LN Density"       : { "timestamps" : [], "values" : []},
-            "LN Balance"       : { "timestamps" : [], "values" : []},
-            "RC Density"       : { "timestamps" : [], "values" : []},
-            "RC Balance"       : { "timestamps" : [], "values" : []},
-            "RC/LN Balance"    : { "timestamps" : [], "values" : []},
-            #"Jack Intensity" : { "timestamps" : [], "values" : []},
-            #"Jack Hand Balance" : { "timestamps" : [], "values" : []},
-            #"Asynchronous Releases" : { "timestamps" : [], "values" : []},
+            "Absolute Density"      : { "timestamps" : [], "values" : []},
+            "Hand Balance"          : { "timestamps" : [], "values" : []},
+            "LN Density"            : { "timestamps" : [], "values" : []},
+            "LN Balance"            : { "timestamps" : [], "values" : []},
+            "RC Density"            : { "timestamps" : [], "values" : []},
+            "RC Balance"            : { "timestamps" : [], "values" : []},
+            "RC/LN Balance"         : { "timestamps" : [], "values" : []},
+            "Jack Intensity"        : { "timestamps" : [], "values" : []},
+            "Jack Hand Balance"     : { "timestamps" : [], "values" : []},
+            "Asynchronous Releases" : { "timestamps" : [], "values" : []},
         }
 
-    def empty_series(self) -> dict:
-        """Simply returns an empty series for use in changing smoothing."""
+    def empty_series(self):
+        """Empties the series for use in changing smoothing."""
 
         self.series = {
             "Absolute Density"      : { "timestamps" : [], "values" : []},
@@ -272,20 +272,15 @@ class DiffItem(QListWidgetItem):
 
             t = t + interval
 
-    def process_releases(self, smoothing: int, interval: int, length: int, threshold1: int, threshold2: int, thresh_mode: bool):
+    def process_releases(self, smoothing: int, interval: int, length: int, threshold1: int, threshold2: int):
         "Calculate the series for 'Asynchronous Releases'."
 
         #threshold1 is the minimum LN length to be considered an LN
         #threshold2 is how many ms a release needs to be after an LN head or before an LN tail
             #To be considered asynchronous
 
-        if thresh_mode:
-            thresh1 = threshold1
-            thresh2 = threshold2
-
-        else:
-            thresh1 = 1 #off-by-one tolerance just incase
-            thresh2 = 1
+        thresh1 = threshold1 if threshold1 > 0 else 2
+        thresh2 = threshold2 if threshold2 > 0 else 2
 
         data = self._difficulty.data["asynch"]
 

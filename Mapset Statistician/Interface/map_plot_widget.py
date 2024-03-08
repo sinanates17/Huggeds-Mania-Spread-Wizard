@@ -51,11 +51,14 @@ class MapPlotWidget(QWidget):
         """
 
         self.ax.cla()
-        for data in [diff.series for diff in diffs]:
+        legend = []
+        for data, name in [(diff.series, diff.name()) for diff in diffs]:
             x = data[key]["timestamps"]
             y = data[key]["values"]
             self.ax.plot(x,y)
+            legend.append(name)
 
+        self.ax.legend(legend, framealpha=0, labelcolor='white')
         self.ax.set_title(key, color='white')
 
         match key:

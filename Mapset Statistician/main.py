@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication
 from Interface.main_window import MainWindow
 
 if __name__ == '__main__':
+    version = '1.0'
     app = QApplication(sys.argv)
     window = MainWindow()
     window.move(100,100)
