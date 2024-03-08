@@ -8,7 +8,8 @@
   This application is still missing some end-usability features. For example, there's no beatmap search function yet. Once you select your songs folder, you're only given the 50 most recently modified beatmaps. I hope to smoothen out these rough edges in the first few updates after release.
 
 ## Examples
-- Here is a difficulty gap between two difficulties created by a big difference in jack usage
+Here is a difficulty gap between two difficulties created by a big difference in jack usage
+
   ![](https://hugged.s-ul.eu/2nzse1tE)
 
 ## Documentation
