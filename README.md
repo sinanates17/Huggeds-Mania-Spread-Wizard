@@ -3,7 +3,7 @@
 ## About
   Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison.
   This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues.
-  Please read the documentation. There are sliders and options whose functions aren't immediately clear. The documentation explains them.
+  Please read the documentation (scroll down). There are sliders and options whose functions aren't immediately clear. The documentation explains them.
 
   This application is still missing some end-usability features. For example, there's no beatmap search function yet. Once you select your songs folder, you're only given the 50 most recently modified beatmaps. I hope to smoothen out these rough edges in the first few updates after release.
 
