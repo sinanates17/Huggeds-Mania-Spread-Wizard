@@ -14,14 +14,14 @@ For graph types labelled with `Balance`, what's being graphed is the ratio of th
 
 ### Absolute/RC/LN Density
 Every note is assigned a strain of 1. The strains are summed over a window of `±Smoothing` at each timestamp, then averaged over time to give `strain per second`, which is just `notes per second` in this case.
-The RC/LN Density options do the exact same thing as Absolute density, but only counts rice notes or long notes, respectively.
+The `RC/LN Density` options do the exact same thing as `Absolute Density`, but only counts rice notes or long notes, respectively.
 
 ### Absolute/RC/LN Hand Balance
 Notes per second is calculated on each hand exactly as above, with the middle key in odd keymodes counting twice, once for each hand. The ratio of `Right strain:Left strain` is taken and transformed to fit in the range `[-1,1]`, such that:
   - `1` and `-1` correspond to 100% right and left hand loading, respectively.
   - `0` corresponds to equal note density across both hands.
   - `.2` and `.5` corresponds to and 60% and 75% right hand loading, respectively.
-  - etc
+  - etc.
 
 ### RC/LN Balance
 The same calculation from the `Hand Balance` graphs are used, except the ratio of interest is `Rice density:LN density` rather than `Right hand:Left hand`
