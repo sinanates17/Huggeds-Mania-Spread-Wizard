@@ -319,6 +319,7 @@ class SongWindow(QWidget):
         self.smoothing_slider.setMaximum(100)
         self.smoothing_slider.setValue(30)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
+        self.smoothing_slider.sliderReleased.connect(self.process_key)
         self.smoothing_slider.setGeometry(240, 860, 820, 20)
         self.smoothing_slider.setStyleSheet(
             """
@@ -358,6 +359,7 @@ class SongWindow(QWidget):
         )
         self.threshold_slider.setGeometry(240, 790, 820, 40)
         self.threshold_slider.valueChanged.connect(self.change_threshold)
+        self.threshold_slider.sliderReleased.connect(self.process_key)
         self.threshold_slider.hide()
         self.widgets.append(self.threshold_slider)
 
@@ -390,6 +392,7 @@ class SongWindow(QWidget):
         )
         self.threshold2_slider.setGeometry(240, 730, 820, 40)
         self.threshold2_slider.valueChanged.connect(self.change_threshold)
+        self.threshold2_slider.sliderReleased.connect(self.process_key)
         self.threshold2_slider.hide()
         self.widgets.append(self.threshold2_slider)
 
@@ -488,8 +491,6 @@ class SongWindow(QWidget):
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
         self.sample_interval = self.smoothing / 2.5 #self.smoothing ** (2/3)
 
-        self.process_key()
-
     def change_threshold(self, v):
         """Connected to the threshold sliders."""
 
@@ -498,9 +499,6 @@ class SongWindow(QWidget):
 
         self.threshold2 = self.threshold2_slider.value() * 10
         self.label_threshold2.setText(f"Threshold 2: {self.threshold2}ms")
-
-        if self.threshold_mode.isChecked():
-            self.process_key()
 
     def duration(self) -> int:
         """Returns the song length in ms"""
