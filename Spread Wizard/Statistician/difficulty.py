@@ -40,10 +40,10 @@ class Difficulty:
             mapping = False
             lines = f.readlines()
             for line in lines:
-                if 'Version' in line:
+                if 'Version:' in line:
                     name = line[8:-1]
 
-                elif 'CircleSize' in line:
+                elif 'CircleSize:' in line:
                     keymode = int(line[11:-1])
 
                 elif 'Title:' in line:

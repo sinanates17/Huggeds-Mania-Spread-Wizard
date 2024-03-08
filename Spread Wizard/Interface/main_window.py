@@ -4,8 +4,9 @@
 
 from os import listdir, path
 import json
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QLabel
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
@@ -54,6 +55,12 @@ class MainWindow(QMainWindow):
                 self.folder_button.folder_path = data["folder_path"]
                 self.refresh_songs()
 
+        self.label_version = QLabel(self)
+        font = QFont("Nunito", 10)
+        font.setBold(True)
+        self.label_version.setFont(font)
+        self.label_version.setStyleSheet("color: #ab89b1;")
+        self.label_version.setGeometry(0, 970, 1500, 30)
 
     def refresh_songs(self):
         """Update the song select menu."""
@@ -89,3 +96,11 @@ class MainWindow(QMainWindow):
         self.title.setGeometry(0, 0, size.width(), 30)
         self.song_list.setGeometry(30, 60, 210, size.height() - 90)
         #self.song_window.setGeometry(270, 60, size.height() - 90, size.width() - 300)
+
+    def disp_version(self, current: str, latest: str):
+        """Show version info at the bottom of the screen."""
+        if current == latest:
+            self.label_version.setText(f"  Version {current}. You are up to date!")
+        else:
+            self.label_version.setText(f"  Version {current}. Download {latest} at http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest")
+
