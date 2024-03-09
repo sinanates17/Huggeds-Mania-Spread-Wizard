@@ -12,7 +12,7 @@ Please keep the .exe in its own folder because it generates a `cache.json` file 
 
   This application is still missing some end-usability features. For example, there's no beatmap search function yet. Once you select your songs folder, you're only given the 50 most recently modified beatmaps. The window scale also might not play well with all monitor resolutions. I hope to smoothen out these rough edges in the first few updates after release.
 
-  ![](https://tenor.com/view/look-at-this-graph-nickelback-gif-12683147)
+  ![]([https://tenor.com/view/look-at-this-graph-nickelback-gif-12683147](https://tenor.com/view/look-at-this-graph-nickelback-gif-12683147))
 
 ## Examples
 Here is a difficulty gap between two difficulties created by a big difference in jack usage:
