@@ -3,6 +3,8 @@
 ### [Download the latest version here](http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest). 
 Make sure to download `Spread.Wizard.X.X.zip` and not the `Source Code` downloads.
 
+Please keep the .exe in its own folder because it generates a `cache.json` file to keep track of your songs folder.
+
 ## About
   Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison.
   This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues.
