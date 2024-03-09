@@ -1,5 +1,5 @@
 PyQt5
 tk
 matplotlib
-audioread
+librosa
 ffmpeg (added to PATH)
