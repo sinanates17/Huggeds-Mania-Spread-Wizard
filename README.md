@@ -44,10 +44,12 @@ The same calculation from the `Hand Balance` graphs are used, except the ratio o
 
 ### Jack Intensity
 If **Alternate Calculator** is not checked:
+
 Every note is assigned a strain of 1 if the distance between that note and the previous note in the same column is less than `Max. Stack Distance`, else a strain of 0. The `strain per second` is then calculated and plotted as in the `Density` graphs.
 Adjusting the `Max. Stack Distance` would be useful for finding unwanted jacks at a certain tightness.
   
 If **Alternate Calculator** is checked:
+
 Every note is assigned a strain that scales with the inverse square of the distance from the previous note in the same column such that at 180BPM, 1/4, 1/2, and 1/1 stacks have strains of 4, 1 and .25, respectively. The `strain per second` is then calculated and plotted as in the `Density` graphs.
 
 ### Jack Balance
