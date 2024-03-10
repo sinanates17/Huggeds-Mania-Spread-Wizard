@@ -7,7 +7,7 @@ from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QCheckBox
-from librosa import get_duration
+from pydub import AudioSegment
 from Interface.map_plot_widget import MapPlotWidget
 from Interface.diff_item import DiffItem
 from Interface.slider_unclickable import SliderUnclickable
@@ -481,7 +481,7 @@ class SongWindow(QWidget):
             self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
             self.audio_path = f"{song_path}/{ref.audio()}"
 
-            self.length = int(get_duration(path=self.audio_path) * 1000) #Extract the length in ms of the mapset's audio.
+            self.length = AudioSegment.from_file(self.audio_path).duration_seconds * 1000 #Extract the length in ms of the mapset's audio.
 
             self.process_key()
 
