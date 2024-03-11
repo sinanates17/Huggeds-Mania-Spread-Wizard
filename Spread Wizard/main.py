@@ -1,6 +1,6 @@
 """Main script for Mapset Statistician."""
 
-# pylint: disable=E0611
+# pylint: disable=E0611, E0401
 import sys
 import requests
 from PyQt5.QtWidgets import QApplication
