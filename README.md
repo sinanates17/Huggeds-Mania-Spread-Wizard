@@ -18,6 +18,7 @@
 - Unfuck Windows Scaling causing giant text in the app
 - Bracket detection
 - Shield/reverse shield detection
+- Per-column strain
 - Figure out a better way to compile the app to make a smaller .exe
 - In-app audio player that traces along the graph.
 - Optimization
