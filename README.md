@@ -8,9 +8,7 @@
 - [Download and add FFmpeg to your PATH variable](https://phoenixnap.com/kb/ffmpeg-windows). I will get rid of this requirement in a future update, but until then, sorry for the inconvenience. The application will crash without FFmpeg.
 
 ## About
-  Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison.
-  This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues.
-  Please read the documentation (scroll down). There are sliders and options whose functions aren't immediately clear. The documentation explains them.
+  Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison. This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues. It's only as useful as how well the modder knows what they're looking for. Please read the documentation for how the different graphs work (scroll down).
 
   This application is still missing some end-usability features. For example, there's no beatmap search function yet. Once you select your songs folder, you're only given the 50 most recently modified beatmaps. The window scale also might not play well with all monitor resolutions. I hope to smoothen out these rough edges in the first few updates after release.
 
