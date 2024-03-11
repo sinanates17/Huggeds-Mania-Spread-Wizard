@@ -2,3 +2,4 @@ PyQt5
 tk
 matplotlib
 librosa
+FFmpeg added to PATH

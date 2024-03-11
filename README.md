@@ -1,16 +1,26 @@
 # Spread Wizard
 
-### [Download the latest version here](http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest). 
-Make sure to download `Spread.Wizard.X.X.zip` and not the `Source Code` downloads.
+## How to Install
 
-Please keep the .exe in its own folder because it generates a `cache.json` file to keep track of your songs folder.
+- [Download the latest version here](http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest). 
+- Make sure to download `Spread.Wizard.X.X.zip` and not the `Source Code` downloads.
+- Please keep the .exe in its own folder because it generates a `cache.json` file to keep track of your songs folder.
+- [Download and add FFmpeg to your PATH variable](https://phoenixnap.com/kb/ffmpeg-windows). I will get rid of this requirement in a future update, but until then, sorry for the inconvenience. The application will crash without FFmpeg.
 
 ## About
-  Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison.
-  This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues.
-  Please read the documentation (scroll down). There are sliders and options whose functions aren't immediately clear. The documentation explains them.
+  Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison. This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues. It's only as useful as how well the modder knows what they're looking for. Please read the documentation for how the different graphs work (scroll down).
 
   This application is still missing some end-usability features. For example, there's no beatmap search function yet. Once you select your songs folder, you're only given the 50 most recently modified beatmaps. The window scale also might not play well with all monitor resolutions. I hope to smoothen out these rough edges in the first few updates after release.
+
+### Plans and Problems (In No Particular Order)
+- Remove FFmpeg dependency
+- Beatmap search function
+- Unfuck Windows Scaling causing giant text in the app
+- Bracket detection
+- Shield/reverse shield detection
+- Figure out a better way to compile the app to make a smaller .exe
+- In-app audio player that traces along the graph.
+- Optimization
 
   ![](https://media1.tenor.com/m/F-LgB1xTebEAAAAd/look-at-this-graph-nickelback.gif)
 
