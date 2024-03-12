@@ -6,7 +6,7 @@
 - Make sure to download `Spread.Wizard.X.X.zip` and not the `Source Code` downloads.
 - Please keep the .exe in its own folder because it generates a `cache.json` file to keep track of your songs folder.
 - [Download and add FFmpeg to your PATH variable](https://phoenixnap.com/kb/ffmpeg-windows). I will get rid of this requirement in a future update, but until then, sorry for the inconvenience. The application will crash without FFmpeg.
-- To my knowledge, this app will only work on Windows.
+- App might not work if you're not on Windows
 
 ## About
   Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison. This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues. It's only as useful as how well the modder knows what they're looking for. Please read the documentation for how the different graphs work (scroll down).
