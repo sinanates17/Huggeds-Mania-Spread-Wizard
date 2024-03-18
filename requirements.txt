@@ -3,3 +3,4 @@ tk
 matplotlib
 librosa
 FFmpeg added to PATH
+Python 3.12.1
