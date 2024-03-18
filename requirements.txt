@@ -1,6 +1,6 @@
 PyQt5
 tk
 matplotlib
-librosa
+pydub
 FFmpeg added to PATH
 Python 3.12.1
