@@ -20,25 +20,25 @@ class MainWindow(QMainWindow):
 
         self.setStyleSheet("background-color: #111111")
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setGeometry(0, 0, 1600, 1000)
+        #self.setGeometry(0, 0, 1600, 1000)
 
         self.title = TitleBar(self)
 
         self.folder_path = None
         self.folder_button = SongFolderButton(self)
-        x = int(self.size().width()/2)
-        y = int(self.size().height()/2)
-        self.folder_button.setGeometry(x-120, y-40, 240, 80)
+        #x = int(self.size().width()/2)
+        #y = int(self.size().height()/2)
+        #self.folder_button.setGeometry(x-120, y-40, 240, 80)
 
         self.song_list = SongList(self)
-        self.song_list.setGeometry(30, 60, 210, 910)
+        #self.song_list.setGeometry(30, 60, 210, 910)
         self.song_list.itemSelectionChanged.connect(
             lambda: self.song_window.load_song(
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
         self.song_list.hide()
 
         self.song_window = SongWindow(self)
-        self.song_window.setGeometry(270, 60, 1300, 910)
+        #self.song_window.setGeometry(270, 60, 1300, 910)
         self.song_window.hide()
 
         if "cache.json" not in listdir():
@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         font.setBold(True)
         self.label_version.setFont(font)
         self.label_version.setStyleSheet("color: #ab89b1;")
-        self.label_version.setGeometry(0, 970, 1500, 30)
+        #self.label_version.setGeometry(0, 970, 1500, 30)
 
     def refresh_songs(self):
         """Update the song select menu."""
@@ -92,15 +92,30 @@ class MainWindow(QMainWindow):
 
         super().resizeEvent(event)
 
-        size = event.size()
-        self.title.setGeometry(0, 0, size.width(), 30)
-        self.song_list.setGeometry(30, 60, 210, size.height() - 90)
-        #self.song_window.setGeometry(270, 60, size.height() - 90, size.width() - 300)
+        w, h = event.size().width(), event.size().height()
+        self.resize_children(w, h)
 
-    def disp_version(self, current: str, latest: str):
+    def check_update(self, current: str, latest: str):
         """Show version info at the bottom of the screen."""
         if current == latest:
             self.label_version.setText(f"  Version {current}. You are up to date!")
         else:
             self.label_version.setText(f"  Version {current}. Download {latest} at http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest")
 
+    def resize_children(self, w, h):
+        """Handle resizing of child widgets."""
+
+        self.title.setGeometry(0, 0, w, 30)
+
+        bx, by = int(w / 2) - 120, int(h / 2) - 40
+        self.folder_button.setGeometry(bx, by, 240, 80)
+
+        ch = h - 90
+        self.song_list.setGeometry(30, 60, 210, ch)
+
+        dw = w - 300
+        dh = h - 90
+        self.song_window.setGeometry(270, 60, dw, dh)
+
+        ey = h - 30
+        self.label_version.setGeometry(0, ey, w, 30)
