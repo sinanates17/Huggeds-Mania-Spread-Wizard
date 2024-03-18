@@ -31,21 +31,50 @@ class SongWindow(QWidget):
 
         #Create all child widgets then run _init_ui to set them up
         self.label_title = QLabel(self)
+
         self.label_creator = QLabel("Please select a beatmap folder...", self)
+
         self.diff_list = QListWidget(self)
+        self.diff_list.itemSelectionChanged.connect(
+            self.process_key
+        )
+
         self.plot_list = QListWidget(self)
+        self.plot_list.itemSelectionChanged.connect(
+            self.process_key
+        )
+
         self.label_diff = QLabel("Select difficulties\nto compare", self)
+
         self.label_plot = QLabel("Select what\nto compare", self)
+
         self.smoothing_slider = SliderUnclickable(Qt.Horizontal, self)
+        self.smoothing_slider.valueChanged.connect(self.change_smoothing)
+        self.smoothing_slider.sliderReleased.connect(self.process_key)
+
         self.threshold_slider = SliderUnclickable(Qt.Horizontal, self)
+        self.threshold_slider.valueChanged.connect(self.change_threshold)
+        self.threshold_slider.sliderReleased.connect(self.process_key)
+
         self.threshold2_slider = SliderUnclickable(Qt.Horizontal, self)
+        self.threshold2_slider.valueChanged.connect(self.change_threshold)
+        self.threshold2_slider.sliderReleased.connect(self.process_key)
+
         self.threshold_mode = QCheckBox(self)
+        self.threshold_mode.stateChanged.connect(self.process_key)
+
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
+
         self.label_threshold = QLabel(f"Threshold 1: {self.threshold}ms", self)
+
         self.label_threshold2 = QLabel(f"Threshold 2: {self.threshold}ms", self)
+
         self.plot = MapPlotWidget(self)
+
         self.thresh1_desc = ""
+
         self.thresh2_desc = ""
+
         self._init_ui()
 
     def _init_ui(self):
@@ -115,9 +144,6 @@ class SongWindow(QWidget):
         self.plot_list.setLayoutDirection(Qt.RightToLeft)
         self.plot_list.setWordWrap(True)
         self.plot_list.setGeometry(1090, 575, 180, 305)
-        self.plot_list.itemSelectionChanged.connect(
-            self.process_key
-        )
 
         self.plot_list.setStyleSheet("""
             QListWidget {
@@ -184,8 +210,9 @@ class SongWindow(QWidget):
         plot_font = QFont("Nunito", 8)
         plot_font.setBold(True)
         items = []
-        for key in ["Absolute Density", "Hand Balance", "RC Density", "RC Balance", "LN Density",
-                    "LN Balance", "RC/LN Balance", "Jack Intensity", "Jack Balance", "Asynchronous Releases"]:
+        # Following keys are in order of usefulness.
+        for key in ["Absolute Density", "Jack Intensity", "Asynchronous Releases", "Hand Balance", "RC Density",
+                    "RC Balance", "LN Density", "LN Balance", "RC/LN Balance", "Jack Balance"]:
             item = QListWidgetItem(key)
             item.setFont(plot_font)
             self.plot_list.addItem(item)
@@ -231,9 +258,6 @@ class SongWindow(QWidget):
         self.diff_list.setSelectionMode(QAbstractItemView.MultiSelection)
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.diff_list.itemSelectionChanged.connect(
-            self.process_key
-        )
         self.diff_list.setWordWrap(True)
         self.diff_list.setGeometry(30, 575, 180, 305)
         self.diff_list.setStyleSheet("""
@@ -321,8 +345,6 @@ class SongWindow(QWidget):
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
         self.smoothing_slider.setValue(30)
-        self.smoothing_slider.valueChanged.connect(self.change_smoothing)
-        self.smoothing_slider.sliderReleased.connect(self.process_key)
         self.smoothing_slider.setGeometry(240, 860, 820, 20)
         self.smoothing_slider.setStyleSheet(
             """
@@ -361,8 +383,6 @@ class SongWindow(QWidget):
             """
         )
         self.threshold_slider.setGeometry(240, 790, 820, 40)
-        self.threshold_slider.valueChanged.connect(self.change_threshold)
-        self.threshold_slider.sliderReleased.connect(self.process_key)
         self.threshold_slider.hide()
         self.widgets.append(self.threshold_slider)
 
@@ -394,8 +414,6 @@ class SongWindow(QWidget):
             """
         )
         self.threshold2_slider.setGeometry(240, 730, 820, 40)
-        self.threshold2_slider.valueChanged.connect(self.change_threshold)
-        self.threshold2_slider.sliderReleased.connect(self.process_key)
         self.threshold2_slider.hide()
         self.widgets.append(self.threshold2_slider)
 
@@ -412,7 +430,6 @@ class SongWindow(QWidget):
         self.threshold_mode.setText("Alternate Calculator")
         self.threshold_mode.setFont(diff_font)
         self.threshold_mode.setGeometry(240, 560, 240, 60)
-        self.threshold_mode.stateChanged.connect(self.process_key)
         self.threshold_mode.setStyleSheet("""
             QCheckBox { background-color: none;
                         color: #888888 }
@@ -430,7 +447,7 @@ class SongWindow(QWidget):
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
 
-        self.plot.setGeometry(-80,110,1460,420)#310)
+        self.plot.setGeometry(-80,110,1460,420)
         self.plot.hide()
         self.widgets.append(self.plot)
 
@@ -607,3 +624,15 @@ class SongWindow(QWidget):
                     self.change_threshold()
 
         self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
+
+    def setGeometry(self, ax, ay, aw, ah):
+        """Modify setGeometry method to handle resizing child widgets."""
+
+        super().setGeometry(ax, ay, aw, ah)
+
+        self.resize_children(aw, ah)
+    
+    def resize_children(self, w, h):
+        """Handle resizing of child widgets."""
+
+        
