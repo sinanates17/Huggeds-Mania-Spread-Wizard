@@ -51,20 +51,20 @@ class TitleBar(QWidget):
         layout.addWidget(minimize_button)
 
         # Add a maximize/restore button
-        #self.maximize_button = QPushButton("□", self)
-        #self.maximize_button.setStyleSheet(
-        #    "QPushButton       { background-color: #222222; color: #f9d5ff; border: none; }"
-        #    "QPushButton:hover { background-color: #333333; color: #f9d5ff; border: none; }")
-        #self.maximize_button.setFixedSize(40, 30)
-        #self.maximize_button.clicked.connect(self.toggleMaximize)
-        #self.maximize_button.setFont(font)
-        #layout.addWidget(self.maximize_button)
+        self.maximize_button = QPushButton("□", self)
+        self.maximize_button.setStyleSheet(
+            "QPushButton       { background-color: #222222; color: #f9d5ff; border: none; }"
+            "QPushButton:hover { background-color: #333333; color: #f9d5ff; border: none; }")
+        self.maximize_button.setFixedSize(40, 30)
+        self.maximize_button.clicked.connect(self.toggleMaximize)
+        self.maximize_button.setFont(font)
+        layout.addWidget(self.maximize_button)
 
         # Add a close button
         close_button = QPushButton("X", self)
         close_button.setStyleSheet(
             "QPushButton       { background-color: #222222; color: #f9d5ff; border: none; }"
-            "QPushButton:hover { background-color: #333333; color: #f9d5ff; border: none; }")
+            "QPushButton:hover { background-color: #ff0000; color: #f9d5ff; border: none; }")
         close_button.setFixedSize(40, 30)
         close_button.clicked.connect(self.parent().close)
         close_button.setFont(font)

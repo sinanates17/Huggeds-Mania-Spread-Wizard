@@ -4,41 +4,38 @@
 
 from os import listdir, path
 import json
-from PyQt5.QtWidgets import QMainWindow, QLabel
-from PyQt5.QtCore import Qt
+from pyqt_frameless_window import FramelessMainWindow
+from PyQt5.QtWidgets import QLabel
+#from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
 from Interface.song_window import SongWindow
 
-class MainWindow(QMainWindow):
+class MainWindow(FramelessMainWindow):
     """Define a specialized QMainWindow subclass for Mapset Statistician."""
 
     def __init__(self):
         super().__init__()
 
         self.setStyleSheet("background-color: #111111")
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        #self.setGeometry(0, 0, 1600, 1000)
+        self.setTitleBarVisible(False)
+        self.setPressToMove(False)
+        self.setMinimumSize(400, 200)
 
         self.title = TitleBar(self)
 
         self.folder_path = None
         self.folder_button = SongFolderButton(self)
-        #x = int(self.size().width()/2)
-        #y = int(self.size().height()/2)
-        #self.folder_button.setGeometry(x-120, y-40, 240, 80)
 
         self.song_list = SongList(self)
-        #self.song_list.setGeometry(30, 60, 210, 910)
         self.song_list.itemSelectionChanged.connect(
             lambda: self.song_window.load_song(
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
         self.song_list.hide()
 
         self.song_window = SongWindow(self)
-        #self.song_window.setGeometry(270, 60, 1300, 910)
         self.song_window.hide()
 
         if "cache.json" not in listdir():
@@ -60,7 +57,6 @@ class MainWindow(QMainWindow):
         font.setBold(True)
         self.label_version.setFont(font)
         self.label_version.setStyleSheet("color: #ab89b1;")
-        #self.label_version.setGeometry(0, 970, 1500, 30)
 
     def refresh_songs(self):
         """Update the song select menu."""
@@ -84,9 +80,10 @@ class MainWindow(QMainWindow):
                 self.song_list.add_song(dir_)
                 if len(self.song_list) > 40:
                     break
+            self.folder_button.hide()
 
     # pylint: disable=C0103
-    #(These methods require camelcase cuz PyQt5)
+    #These methods require camelcase cuz PyQt5 stinky poopoo
     def resizeEvent(self, event):
         """Handle resizing the application."""
 
@@ -102,7 +99,14 @@ class MainWindow(QMainWindow):
         else:
             self.label_version.setText(f"  Version {current}. Download {latest} at http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest")
 
-    def resize_children(self, w, h):
+    def setGeometry(self, ax: int, ay: int, aw: int, ah: int):
+        """Modify setGeometry method to handle child widgets"""
+
+        super().setGeometry(ax, ay, aw, ah)
+
+        self.resize_children(aw, ah)
+
+    def resize_children(self, w: int, h: int):
         """Handle resizing of child widgets."""
 
         self.title.setGeometry(0, 0, w, 30)

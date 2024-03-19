@@ -87,7 +87,7 @@ class SongWindow(QWidget):
 
         title_font = QFont("Nunito",32)
         self.label_title.setFont(title_font)
-        self.label_title.setGeometry(30, 20, 1240, 60)
+        #self.label_title.setGeometry(30, 20, 1240, 60)
         self.label_title.setStyleSheet("""
             color: #dddddd;
             """)
@@ -96,7 +96,7 @@ class SongWindow(QWidget):
 
         creator_font = QFont("Nunito",24)
         self.label_creator.setFont(creator_font)
-        self.label_creator.setGeometry(30, 80, 1240, 40)
+        #self.label_creator.setGeometry(30, 80, 1240, 40)
         self.label_creator.setStyleSheet("""
             color: #888888;
             """)
@@ -143,7 +143,7 @@ class SongWindow(QWidget):
         self.plot_list.setVerticalScrollBar(scroll_bar1)
         self.plot_list.setLayoutDirection(Qt.RightToLeft)
         self.plot_list.setWordWrap(True)
-        self.plot_list.setGeometry(1090, 575, 180, 305)
+        #self.plot_list.setGeometry(1090, 575, 180, 305)
 
         self.plot_list.setStyleSheet("""
             QListWidget {
@@ -259,7 +259,7 @@ class SongWindow(QWidget):
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.diff_list.setWordWrap(True)
-        self.diff_list.setGeometry(30, 575, 180, 305)
+        #self.diff_list.setGeometry(30, 575, 180, 305)
         self.diff_list.setStyleSheet("""
             QListWidget {
                 border-radius: 10px;
@@ -323,10 +323,10 @@ class SongWindow(QWidget):
         self.diff_list.hide()
         self.widgets.append(self.diff_list)
 
-        diff_font = QFont("Nunito",16)
+        diff_font = QFont("Nunito",14)
         self.label_diff.setFont(diff_font)
         self.label_diff.setAlignment(Qt.AlignCenter)
-        self.label_diff.setGeometry(30, 515, 180, 60)
+        #self.label_diff.setGeometry(30, 515, 180, 60)
         self.label_diff.setStyleSheet("""
             color: #888888
             """)
@@ -335,7 +335,7 @@ class SongWindow(QWidget):
 
         self.label_plot.setFont(diff_font)
         self.label_plot.setAlignment(Qt.AlignCenter)
-        self.label_plot.setGeometry(1090, 515, 180, 60)
+        #self.label_plot.setGeometry(1090, 515, 180, 60)
         self.label_plot.setStyleSheet("""
             color: #888888
             """)
@@ -345,7 +345,7 @@ class SongWindow(QWidget):
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
         self.smoothing_slider.setValue(30)
-        self.smoothing_slider.setGeometry(240, 860, 820, 20)
+        #self.smoothing_slider.setGeometry(240, 860, 820, 20)
         self.smoothing_slider.setStyleSheet(
             """
             QSlider::groove:horizontal {
@@ -382,12 +382,12 @@ class SongWindow(QWidget):
             }
             """
         )
-        self.threshold_slider.setGeometry(240, 790, 820, 40)
+        #self.threshold_slider.setGeometry(240, 790, 820, 20)
         self.threshold_slider.hide()
         self.widgets.append(self.threshold_slider)
 
         self.label_threshold.setFont(diff_font)
-        self.label_threshold.setGeometry(240, 760, 820, 40)
+        #self.label_threshold.setGeometry(240, 760, 820, 20)
         self.label_threshold.setAlignment(Qt.AlignCenter)
         self.label_threshold.setStyleSheet("""
             color: #888888
@@ -413,12 +413,12 @@ class SongWindow(QWidget):
             }
             """
         )
-        self.threshold2_slider.setGeometry(240, 730, 820, 40)
+        #self.threshold2_slider.setGeometry(240, 730, 820, 40)
         self.threshold2_slider.hide()
         self.widgets.append(self.threshold2_slider)
 
         self.label_threshold2.setFont(diff_font)
-        self.label_threshold2.setGeometry(240, 700, 820, 40)
+        #self.label_threshold2.setGeometry(240, 700, 820, 40)
         self.label_threshold2.setAlignment(Qt.AlignCenter)
         self.label_threshold2.setStyleSheet("""
             color: #888888
@@ -429,7 +429,7 @@ class SongWindow(QWidget):
         self.threshold_mode.setFont(plot_font)
         self.threshold_mode.setText("Alternate Calculator")
         self.threshold_mode.setFont(diff_font)
-        self.threshold_mode.setGeometry(240, 560, 240, 60)
+        #self.threshold_mode.setGeometry(240, 560, 240, 60)
         self.threshold_mode.setStyleSheet("""
             QCheckBox { background-color: none;
                         color: #888888 }
@@ -439,7 +439,7 @@ class SongWindow(QWidget):
         self.widgets.append(self.threshold_mode)
 
         self.label_smoothing.setFont(diff_font)
-        self.label_smoothing.setGeometry(240, 820, 820, 40)
+        #self.label_smoothing.setGeometry(240, 820, 820, 40)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
         self.label_smoothing.setStyleSheet("""
             color: #888888
@@ -447,7 +447,7 @@ class SongWindow(QWidget):
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
 
-        self.plot.setGeometry(-80,110,1460,420)
+        #self.plot.setGeometry(-80,110,1460,420)
         self.plot.hide()
         self.widgets.append(self.plot)
 
@@ -466,7 +466,8 @@ class SongWindow(QWidget):
         pen.setWidth(3)
         pen.setColor(QColor(17, 17, 17))
         qp.setPen(pen)
-        qp.drawLine(0, 130, 1300, 130)
+        w = self.size().width()
+        qp.drawLine(0, 130, w, 130)
         qp.end()
 
     def load_song(self, song_path):
@@ -625,14 +626,70 @@ class SongWindow(QWidget):
 
         self.plot.update_plots(self.plot_list.currentItem().text(), self.diff_list.selectedItems())
 
-    def setGeometry(self, ax, ay, aw, ah):
+    def setGeometry(self, ax: int, ay: int, aw: int, ah: int):
         """Modify setGeometry method to handle resizing child widgets."""
 
         super().setGeometry(ax, ay, aw, ah)
 
         self.resize_children(aw, ah)
-    
-    def resize_children(self, w, h):
-        """Handle resizing of child widgets."""
 
-        
+    def resize_children(self, w: int, h: int):
+        """Handle resizing child widgets"""
+
+        w = 700 if w < 700 else w
+        h = 700 if h < 700 else h
+
+        aw = w - 60
+        self.label_title.setGeometry(30, 20, aw, 60)
+
+        bw = aw
+        self.label_creator.setGeometry(30, 80, bw, 40)
+
+        cy = h - 300
+        self.diff_list.setGeometry(30, cy, 180, 270)
+
+        dx, dy = w - 210, cy
+        self.plot_list.setGeometry(dx, dy, 180, 270)
+
+        ey = dy - 60
+        self.label_diff.setGeometry(30, ey, 180, 60)
+
+        fx, fy = dx, ey
+        self.label_plot.setGeometry(fx, fy, 180, 60)
+
+        gw = w - 480
+        gy = h - 50
+        self.smoothing_slider.setGeometry(240, gy, gw, 20)
+
+        hw = gw
+        hy = gy - 70
+        self.threshold_slider.setGeometry(240, hy, hw, 20)
+
+        iw = gw
+        iy = hy - 70
+        self.threshold2_slider.setGeometry(240, iy, iw, 20)
+
+        jw = gw
+        jy = gy - 40
+        self.label_smoothing.setGeometry(240, jy, jw, 40)
+
+        kw = gw
+        ky = jy - 70
+        self.label_threshold.setGeometry(240, ky, kw, 40)
+
+        lw = gw
+        ly = ky - 70
+        self.label_threshold2.setGeometry(240, ly, lw, 40)
+
+        mw, mh = w + 16, h - 460
+        mx, my = -8, 124
+        self.plot.setGeometry(mx, my, mw, mh)
+
+        left = 60 / mw
+        bottom = 60 / mh
+        width = (mw - 90) / mw
+        height = (mh - 90) / mh
+        self.plot.ax.set_position([left, bottom, width, height])
+
+        ny = h - 315
+        self.threshold_mode.setGeometry(240, ny, 240, 60)

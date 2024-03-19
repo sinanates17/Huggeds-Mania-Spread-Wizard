@@ -18,7 +18,7 @@ class MapPlotWidget(QWidget):
         self.parent = parent
         self.fig, self.ax = plt.subplots()
         self.ax.set_facecolor("black")
-        self.fig.set_facecolor("#2a2a2a")
+        #self.fig.set_facecolor("#444444")#"#2a2a2a")
         self.fig.patch.set_alpha(0)
 
         self.ax.tick_params(axis='x', colors='white')
@@ -31,6 +31,7 @@ class MapPlotWidget(QWidget):
 
         layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(self.fig)
+        self.canvas.blit()
         self.canvas.setStyleSheet("background-color: transparent;")
         layout.addWidget(self.canvas)
 
