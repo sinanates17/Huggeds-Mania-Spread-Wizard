@@ -259,7 +259,6 @@ class SongWindow(QWidget):
         self.diff_list.setFocusPolicy(Qt.NoFocus)
         self.diff_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.diff_list.setWordWrap(True)
-        #self.diff_list.setGeometry(30, 575, 180, 305)
         self.diff_list.setStyleSheet("""
             QListWidget {
                 border-radius: 10px;
@@ -326,7 +325,6 @@ class SongWindow(QWidget):
         diff_font = QFont("Nunito",14)
         self.label_diff.setFont(diff_font)
         self.label_diff.setAlignment(Qt.AlignCenter)
-        #self.label_diff.setGeometry(30, 515, 180, 60)
         self.label_diff.setStyleSheet("""
             color: #888888
             """)
@@ -335,7 +333,6 @@ class SongWindow(QWidget):
 
         self.label_plot.setFont(diff_font)
         self.label_plot.setAlignment(Qt.AlignCenter)
-        #self.label_plot.setGeometry(1090, 515, 180, 60)
         self.label_plot.setStyleSheet("""
             color: #888888
             """)
@@ -345,7 +342,6 @@ class SongWindow(QWidget):
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
         self.smoothing_slider.setValue(30)
-        #self.smoothing_slider.setGeometry(240, 860, 820, 20)
         self.smoothing_slider.setStyleSheet(
             """
             QSlider::groove:horizontal {
@@ -382,12 +378,10 @@ class SongWindow(QWidget):
             }
             """
         )
-        #self.threshold_slider.setGeometry(240, 790, 820, 20)
         self.threshold_slider.hide()
         self.widgets.append(self.threshold_slider)
 
         self.label_threshold.setFont(diff_font)
-        #self.label_threshold.setGeometry(240, 760, 820, 20)
         self.label_threshold.setAlignment(Qt.AlignCenter)
         self.label_threshold.setStyleSheet("""
             color: #888888
@@ -413,12 +407,10 @@ class SongWindow(QWidget):
             }
             """
         )
-        #self.threshold2_slider.setGeometry(240, 730, 820, 40)
         self.threshold2_slider.hide()
         self.widgets.append(self.threshold2_slider)
 
         self.label_threshold2.setFont(diff_font)
-        #self.label_threshold2.setGeometry(240, 700, 820, 40)
         self.label_threshold2.setAlignment(Qt.AlignCenter)
         self.label_threshold2.setStyleSheet("""
             color: #888888
@@ -429,7 +421,6 @@ class SongWindow(QWidget):
         self.threshold_mode.setFont(plot_font)
         self.threshold_mode.setText("Alternate Calculator")
         self.threshold_mode.setFont(diff_font)
-        #self.threshold_mode.setGeometry(240, 560, 240, 60)
         self.threshold_mode.setStyleSheet("""
             QCheckBox { background-color: none;
                         color: #888888 }
@@ -439,7 +430,6 @@ class SongWindow(QWidget):
         self.widgets.append(self.threshold_mode)
 
         self.label_smoothing.setFont(diff_font)
-        #self.label_smoothing.setGeometry(240, 820, 820, 40)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
         self.label_smoothing.setStyleSheet("""
             color: #888888
@@ -447,7 +437,6 @@ class SongWindow(QWidget):
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
 
-        #self.plot.setGeometry(-80,110,1460,420)
         self.plot.hide()
         self.widgets.append(self.plot)
 
@@ -510,7 +499,7 @@ class SongWindow(QWidget):
 
         self.smoothing = v * 100
         self.label_smoothing.setText(f"Smoothing: {self.smoothing}ms")
-        self.sample_interval = self.smoothing / 2.5 #self.smoothing ** (2/3)
+        self.sample_interval = self.smoothing / 2.5
 
     def change_threshold(self, v=None):
         """Connected to the threshold sliders."""

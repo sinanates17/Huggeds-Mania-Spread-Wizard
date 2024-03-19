@@ -3,7 +3,7 @@
 # pylint: disable=E0611
 
 from os import listdir, path
-import json
+from json import dumps, load
 from pyqt_frameless_window import FramelessMainWindow
 from PyQt5.QtWidgets import QLabel
 #from PyQt5.QtCore import Qt
@@ -30,6 +30,7 @@ class MainWindow(FramelessMainWindow):
         self.folder_button = SongFolderButton(self)
 
         self.song_list = SongList(self)
+        self.song_list.max_increased.connect(self.refresh_songs)
         self.song_list.itemSelectionChanged.connect(
             lambda: self.song_window.load_song(
                 f"{self.folder_path}/{self.song_list.currentItem().text()}"))
@@ -41,11 +42,11 @@ class MainWindow(FramelessMainWindow):
         if "cache.json" not in listdir():
             with open("cache.json", "x", encoding="utf8") as f:
                 data = {"folder_path": ""}
-                folder_path = json.dumps(data)
+                folder_path = dumps(data)
                 f.write(folder_path)
 
         with open("cache.json", "r", encoding="utf8") as f:
-            data = json.load(f)
+            data = load(f)
             if data["folder_path"] == "":
                 pass
             else:
@@ -67,7 +68,7 @@ class MainWindow(FramelessMainWindow):
         self.folder_path = self.folder_button.folder_path
         with open("cache.json", "w", encoding="utf8") as f:
             data = {"folder_path": self.folder_path}
-            folder_path = json.dumps(data)
+            folder_path = dumps(data)
             f.write(folder_path)
 
         if self.folder_path is None:
@@ -76,9 +77,10 @@ class MainWindow(FramelessMainWindow):
             dirs = listdir(self.folder_path)
             dirs.sort(key=lambda x: path.getmtime(self.folder_path + '/' + x)) # pylint: disable=W0108
             dirs.reverse()
+            self.song_list.set_dir_list(dirs)
             for dir_ in dirs:
                 self.song_list.add_song(dir_)
-                if len(self.song_list) > 40:
+                if len(self.song_list) > self.song_list.:
                     break
             self.folder_button.hide()
 

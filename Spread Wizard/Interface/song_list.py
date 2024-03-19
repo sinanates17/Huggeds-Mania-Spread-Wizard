@@ -1,12 +1,15 @@
 """This module contains a single class to define a song folder select list."""
 
 # pylint: disable=E0611
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QAbstractItemView
 from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from Interface.expanding_scroll_bar import ExpandingScrollBar
 
 class SongList(QListWidget):
     """Define a QListWidget to act as a song folder selection menu."""
+
+    max_increased = pyqtSignal()
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -46,7 +49,8 @@ class SongList(QListWidget):
             }
             """
         )
-        scroll_bar = QScrollBar(self)
+        scroll_bar = ExpandingScrollBar(self)
+        scroll_bar.max_reached.connect(self.increase_max_songs)
         scroll_bar.setStyleSheet("""
             QScrollBar {
                 border: none;
@@ -82,6 +86,9 @@ class SongList(QListWidget):
             }
             """)
         self.setVerticalScrollBar(scroll_bar)
+        self.max_songs = 20
+        self.dir_list = []
+        self.dir_count = 0
 
     def clear_songs(self):
         """Clear all song folders."""
@@ -99,3 +106,17 @@ class SongList(QListWidget):
         item.setForeground(QColor("#ab89b1"))
         item.setSizeHint(QSize(-1, 60))
         self.addItem(item)
+        self.dir_count = self.dir_count + 1
+
+    def increase_max_songs(self):
+        """make room to load more songs."""
+        a = len(self.dir_list)
+        b = self.max_songs + 10
+
+        self.max_songs = b if b < a else a
+
+        self.max_increased.emit()
+
+    def set_dir_list(self, dirs: list):
+        """Set the list of directories."""
+        self.dir_list = dirs
