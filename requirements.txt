@@ -2,5 +2,6 @@ PyQt5
 tk
 matplotlib
 pydub
+pyqt_frameless_window
 FFmpeg added to PATH
 Python 3.12.1
