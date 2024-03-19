@@ -3,6 +3,7 @@
 # pylint: disable=E0611,W0107,C0301,C0103
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QListWidget, QListWidgetItem
+from PyQt5.QtCore import Qt
 from Statistician.difficulty import Difficulty
 from Statistician.note import Hand
 
@@ -21,6 +22,7 @@ class DiffItem(QListWidgetItem):
         self.setFont(font)
         self._difficulty.calculate_master()
         self.max_ = 0
+        self.setTextAlignment(Qt.AlignCenter)
 
         self.series = {
             "Absolute Density"      : { "timestamps" : [], "values" : []},

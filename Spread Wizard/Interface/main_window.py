@@ -12,6 +12,7 @@ from Interface.title_bar import TitleBar #Import is being called from the root f
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
 from Interface.song_window import SongWindow
+from Interface.search_bar import SearchBar
 
 class MainWindow(FramelessMainWindow):
     """Define a specialized QMainWindow subclass for Mapset Statistician."""
@@ -28,6 +29,9 @@ class MainWindow(FramelessMainWindow):
 
         self.folder_path = None
         self.folder_button = SongFolderButton(self)
+
+        self.search_bar = SearchBar(self)
+        #self.search_bar.search_made.connect()
 
         self.song_list = SongList(self)
         self.song_list.max_increased.connect(self.refresh_songs)
@@ -118,7 +122,7 @@ class MainWindow(FramelessMainWindow):
         self.folder_button.setGeometry(bx, by, 240, 80)
 
         ch = h - 90
-        self.song_list.setGeometry(30, 60, 210, ch)
+        self.song_list.setGeometry(30, 110, 210, ch)
 
         dw = w - 300
         dh = h - 90
@@ -126,3 +130,5 @@ class MainWindow(FramelessMainWindow):
 
         ey = h - 30
         self.label_version.setGeometry(0, ey, w, 30)
+
+        self.search_bar.setGeometry(30, 60, 210, 40)

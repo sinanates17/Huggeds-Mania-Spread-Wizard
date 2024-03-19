@@ -214,6 +214,7 @@ class SongWindow(QWidget):
         for key in ["Absolute Density", "Jack Intensity", "Asynchronous Releases", "Hand Balance", "RC Density",
                     "RC Balance", "LN Density", "LN Balance", "RC/LN Balance", "Jack Balance"]:
             item = QListWidgetItem(key)
+            item.setTextAlignment(Qt.AlignCenter)
             item.setFont(plot_font)
             self.plot_list.addItem(item)
             items.append(item)
@@ -634,11 +635,11 @@ class SongWindow(QWidget):
         bw = aw
         self.label_creator.setGeometry(30, 80, bw, 40)
 
-        cy = h - 300
-        self.diff_list.setGeometry(30, cy, 180, 270)
+        cy = h - 210
+        self.diff_list.setGeometry(30, cy, 180, 180)
 
         dx, dy = w - 210, cy
-        self.plot_list.setGeometry(dx, dy, 180, 270)
+        self.plot_list.setGeometry(dx, dy, 180, 180)
 
         ey = dy - 60
         self.label_diff.setGeometry(30, ey, 180, 60)
@@ -670,7 +671,7 @@ class SongWindow(QWidget):
         ly = ky - 70
         self.label_threshold2.setGeometry(240, ly, lw, 40)
 
-        mw, mh = w + 16, h - 460
+        mw, mh = w + 16, h - 370
         mx, my = -8, 124
         self.plot.setGeometry(mx, my, mw, mh)
 
@@ -680,5 +681,5 @@ class SongWindow(QWidget):
         height = (mh - 90) / mh
         self.plot.ax.set_position([left, bottom, width, height])
 
-        ny = h - 315
+        ny = h - 225
         self.threshold_mode.setGeometry(240, ny, 240, 60)

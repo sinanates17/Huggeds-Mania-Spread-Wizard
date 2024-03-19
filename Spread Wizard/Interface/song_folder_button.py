@@ -17,7 +17,8 @@ class SongFolderButton(QPushButton):
         font.setBold(True)
         self.setFont(font)
         self.setStyleSheet(
-            """QPushButton {
+            """
+            QPushButton {
                 background-color: #111111;
                 color: #f9d5ff;
                 border: none;
@@ -25,7 +26,7 @@ class SongFolderButton(QPushButton):
             QPushButton:hover {
                 background-color: #333333;
                 color: #f9d5ff;
-                border: none; }"
+                border: none; }
             """
             )
 

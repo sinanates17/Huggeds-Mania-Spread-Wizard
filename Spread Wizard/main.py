@@ -19,10 +19,12 @@ if __name__ == '__main__':
     VERSION = '1.0'
     LATEST = get_latest()
     app = QApplication(argv)
-    H = app.desktop().screenGeometry().height()
-    w, h = int((H * .6) * 1.6), int(H * .6)
+    HEIGHT = app.desktop().screenGeometry().height()
+    W, H = int((HEIGHT * .6) * 1.6), int(HEIGHT * .6)
+    W = 1000 if W < 1000 else W
+    H = 790 if H < 790 else H
     window = MainWindow()
     window.check_update(VERSION, LATEST)
-    window.setGeometry(100, 100, w, h)
+    window.setGeometry(100, 100, W, H)
     window.show()
     sys_exit(app.exec_())
