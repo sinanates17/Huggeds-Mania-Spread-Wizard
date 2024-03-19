@@ -1,10 +1,11 @@
 """This module contains a single class to define a song folder select list."""
 
 # pylint: disable=E0611
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import QSize, Qt, pyqtSignal
 from Interface.expanding_scroll_bar import ExpandingScrollBar
+from Interface.song_list_item import SongListItem
 
 class SongList(QListWidget):
     """Define a QListWidget to act as a song folder selection menu."""
@@ -94,14 +95,16 @@ class SongList(QListWidget):
         """Clear all song folders."""
 
         self.clear()
+        self.max_songs = 20
+        self.dir_list = []
+        self.dir_count = 0
 
-    def add_song(self, folder_name: str):
+    def add_song(self, folder_path: str):
         """Add a song folder."""
 
         font = QFont("Nunito", 10)
         font.setBold(True)
-        item = QListWidgetItem()
-        item.setText(folder_name)
+        item = SongListItem(folder_path)
         item.setFont(font)
         item.setForeground(QColor("#ab89b1"))
         item.setSizeHint(QSize(-1, 60))

@@ -11,9 +11,9 @@ class ExpandingScrollBar(QScrollBar):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.valueChanged.connect(self.check_max_reached)
 
-    def setValue(self, value):
-        """Modify setValue method to emit the custom signal"""
-        super().setValue(value)
+    def check_max_reached(self, value):
+        """Emit max_reached if sldier is at the maximum position"""
         if value == self.maximum():
             self.max_reached.emit()
