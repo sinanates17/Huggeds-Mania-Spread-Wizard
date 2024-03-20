@@ -41,7 +41,7 @@ class TitleBar(QWidget):
         layout.addWidget(self.spacer)
 
         # Add a minimize button
-        minimize_button = QPushButton("-", self)
+        minimize_button = QPushButton("🗕", self)
         minimize_button.setStyleSheet(
             "QPushButton       { background-color: #222222; color: #f9d5ff; border: none; }"
             "QPushButton:hover { background-color: #333333; color: #f9d5ff; border: none; }")
@@ -61,7 +61,7 @@ class TitleBar(QWidget):
         layout.addWidget(self.maximize_button)
 
         # Add a close button
-        close_button = QPushButton("X", self)
+        close_button = QPushButton("🗙", self)
         close_button.setStyleSheet(
             "QPushButton       { background-color: #222222; color: #f9d5ff; border: none; }"
             "QPushButton:hover { background-color: #ff0000; color: #f9d5ff; border: none; }")

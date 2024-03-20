@@ -3,7 +3,11 @@
 # pylint: disable=E0611
 from os import listdir
 from PyQt5.QtWidgets import QListWidgetItem
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QFont, QColor
+
+FONT = QFont("Nunito", 10)
+FONT.setBold(True)
 
 class SongListItem(QListWidgetItem):
     """
@@ -16,7 +20,7 @@ class SongListItem(QListWidgetItem):
 
         self.setTextAlignment(Qt.AlignCenter)
 
-        self.metadata = [] #List of all the metadata in the song's .osu
+        self.metadata = "" #Combined metadata
         self.folder_path = path
         self.folder_name = path.split("/")[-1]
         self.artist = ""
@@ -26,6 +30,10 @@ class SongListItem(QListWidgetItem):
         self.mapper = ""
         self.source = ""
         self.tags = ""
+
+        self.setFont(FONT)
+        self.setForeground(QColor("#ab89b1"))
+        self.setSizeHint(QSize(-1, 60))
 
         for file in listdir(self.folder_path):
             if file.endswith(".osu"):
@@ -62,8 +70,9 @@ class SongListItem(QListWidgetItem):
 
         for prop in props:
             for word in prop.split(" "):
-                self.metadata.append(word)
+                self.metadata = self.metadata + f"{word} "
 
+        self.metadata = self.metadata.lower()
         self.setText(f"{self.artist} - {self.title}\nby {self.mapper}")
 
     def folder(self) -> str:
@@ -73,3 +82,8 @@ class SongListItem(QListWidgetItem):
     def path(self) -> str:
         """Return the path to the folder"""
         return self.folder_path
+
+    def __deepcopy__(self, o):
+        """Tell deepcopy how to copy an instance of this thing."""
+
+        return SongListItem(self.folder_path)

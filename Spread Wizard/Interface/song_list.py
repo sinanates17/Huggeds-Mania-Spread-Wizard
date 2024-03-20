@@ -96,11 +96,12 @@ class SongList(QListWidget):
 
         self.clear()
         self.max_songs = 20
-        self.dir_list = []
+        #self.dir_list = []
         self.dir_count = 0
 
-    def add_song(self, folder_path: str):
-        """Add a song folder."""
+    @staticmethod
+    def generate_item(folder_path: str) -> SongListItem:
+        """Create a SongListItem from a beatmap folder."""
 
         font = QFont("Nunito", 10)
         font.setBold(True)
@@ -108,14 +109,12 @@ class SongList(QListWidget):
         item.setFont(font)
         item.setForeground(QColor("#ab89b1"))
         item.setSizeHint(QSize(-1, 60))
-        self.addItem(item)
-        self.dir_count = self.dir_count + 1
+        return item
 
     def increase_max_songs(self):
         """make room to load more songs."""
         a = len(self.dir_list)
         b = self.max_songs + 10
-
         self.max_songs = b if b < a else a
 
         self.max_increased.emit()

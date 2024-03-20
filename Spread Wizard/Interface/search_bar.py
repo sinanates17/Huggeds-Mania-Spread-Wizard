@@ -1,24 +1,23 @@
 """This module contains a class definition for SearchBar"""
 
-# pylint: disable=E0611
+# pylint: disable=E0611, C0103
 #from os import listdir
-from PyQt5.QtWidgets import QWidget, QTextEdit, QPushButton, QLabel
+from PyQt5.QtWidgets import QWidget, QTextEdit, QPushButton
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 
 class SearchBar(QWidget):
     """A search bar with a button to signal a search"""
 
-    search_made = pyqtSignal()
+    search_made = pyqtSignal(list)
 
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.empty_label = QLabel(self, text=" Search by metadata...")
         self.search_text = QTextEdit(self)
-        self.search_text.textChanged.connect(self.check_empty)
         self.search_button = QPushButton(self, text="🔍")
         self.search_button.pressed.connect(self.on_button_pressed)
+        self.last_query = ""
 
         self._init_ui()
 
@@ -34,55 +33,41 @@ class SearchBar(QWidget):
             """
         )
 
-        self.empty_label.setFont(font)
-        self.empty_label.setAlignment(Qt.AlignCenter)
-        self.empty_label.setStyleSheet(
-            """
-            background-color: #2a2a2a;
-            border-radius: 10px;
-            border: none;
-            color: #ab89b1;
-            """
-        )
-
+        self.search_text.setPlaceholderText("     Search by metadata")
+        self.search_text.setLineWrapMode(QTextEdit.NoWrap)
+        self.search_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.search_text.setFont(font)
         self.search_text.setStyleSheet(
             """
-            color: white;
-            border: none;
-            background: transparent;
+            QTextEdit {
+                color: white;
+                border: none;
+                background-color: #2a2a2a;
+                border-radius: 10px;
+                padding-top: 9px;
+            }
             """
         )
 
         self.search_button.setStyleSheet(
             """
             QPushButton {
-                background-color: #111111;
+                background-color: #222222;
                 color: #f9d5ff;
                 border: none;
-                border-radius: 5px; }
+                border-radius: 10px; }
             QPushButton:hover {
-                background-color: #333333;
+                background-color: #444444;
                 color: #f9d5ff;
                 border: none; }
             """
         )
 
-    def check_empty(self):
-        """Show the empty_label if the search bar is empty"""
-
-        text = self.search_text.toPlainText()
-
-        if text == "":
-            self.empty_label.show()
-
-        else:
-            self.empty_label.hide()
-
     def on_button_pressed(self):
         """Emits a custom signal when the search button is pressed."""
 
-        search_terms = self.search_text.toPlainText().split()
+        self.last_query = self.search_text.toPlainText()
+        search_terms = self.search_text.toPlainText().lower().split()
         self.search_made.emit(search_terms)
 
     def setGeometry(self, x: int, y: int, w: int, h: int):
@@ -92,8 +77,12 @@ class SearchBar(QWidget):
 
         aw = w - 50
         self.search_text.setGeometry(0, 0, aw, h)
-        self.empty_label.setGeometry(0, 0, aw, h)
 
         bw = 40
         bx = w - 40
         self.search_button.setGeometry(bx, 0, bw, h)
+
+    def previous(self) -> str:
+        """Return the text in the search bar"""
+
+        return self.last_query

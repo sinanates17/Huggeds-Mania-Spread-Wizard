@@ -385,7 +385,8 @@ class SongWindow(QWidget):
         self.label_threshold.setFont(diff_font)
         self.label_threshold.setAlignment(Qt.AlignCenter)
         self.label_threshold.setStyleSheet("""
-            color: #888888
+            color: #888888;
+            background-color: transparent;
             """)
         self.label_threshold.hide()
         self.widgets.append(self.label_threshold)
@@ -414,7 +415,8 @@ class SongWindow(QWidget):
         self.label_threshold2.setFont(diff_font)
         self.label_threshold2.setAlignment(Qt.AlignCenter)
         self.label_threshold2.setStyleSheet("""
-            color: #888888
+            color: #888888;
+            background-color: transparent;
             """)
         self.label_threshold2.hide()
         self.widgets.append(self.label_threshold2)
@@ -433,7 +435,8 @@ class SongWindow(QWidget):
         self.label_smoothing.setFont(diff_font)
         self.label_smoothing.setAlignment(Qt.AlignCenter)
         self.label_smoothing.setStyleSheet("""
-            color: #888888
+            color: #888888;
+            background-color: transparent;
             """)
         self.label_smoothing.hide()
         self.widgets.append(self.label_smoothing)
@@ -479,6 +482,8 @@ class SongWindow(QWidget):
                                 self.diff_list.addItem(box)
                             else:
                                 break
+
+        self.diff_list.selectAll()
 
         if len(self.diff_checkboxes) > 0:
             for w in self.widgets:
@@ -652,23 +657,23 @@ class SongWindow(QWidget):
         self.smoothing_slider.setGeometry(240, gy, gw, 20)
 
         hw = gw
-        hy = gy - 70
+        hy = gy - 50
         self.threshold_slider.setGeometry(240, hy, hw, 20)
 
         iw = gw
-        iy = hy - 70
+        iy = hy - 50
         self.threshold2_slider.setGeometry(240, iy, iw, 20)
 
         jw = gw
-        jy = gy - 40
+        jy = gy - 35
         self.label_smoothing.setGeometry(240, jy, jw, 40)
 
         kw = gw
-        ky = jy - 70
+        ky = jy - 50
         self.label_threshold.setGeometry(240, ky, kw, 40)
 
         lw = gw
-        ly = ky - 70
+        ly = ky - 50
         self.label_threshold2.setGeometry(240, ly, lw, 40)
 
         mw, mh = w + 16, h - 370

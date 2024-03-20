@@ -35,12 +35,12 @@ class MapPlotWidget(QWidget):
         self.canvas.setStyleSheet("background-color: transparent;")
         layout.addWidget(self.canvas)
 
-    def set_axisx(self, lim0: int, lim1: int):
+    def set_axisx(self, lim0, lim1):
         """Set x axis from 0 to lim"""
         self.ax.set(xlim=(lim0,lim1))
         #self.fig.canvas.draw()
 
-    def set_axisy(self, lim0: int, lim1: int):
+    def set_axisy(self, lim0, lim1):
         """Set y axis from 0 to lim"""
         self.ax.set(ylim=(lim0,lim1))
         #self.fig.canvas.draw()
@@ -64,6 +64,7 @@ class MapPlotWidget(QWidget):
 
         match key:
             case "Absolute Density":
+                self.set_axisy(0, None)
                 self.ax.set_ylabel("NPS")
 
             case "Hand Balance":
@@ -71,6 +72,7 @@ class MapPlotWidget(QWidget):
                 self.ax.set_ylabel("Hand Bias")
 
             case "RC Density":
+                self.set_axisy(0, None)
                 self.ax.set_ylabel("NPS")
 
             case "RC Balance":
@@ -78,6 +80,7 @@ class MapPlotWidget(QWidget):
                 self.ax.set_ylabel("Hand Bias")
 
             case "LN Density":
+                self.set_axisy(0, None)
                 self.ax.set_ylabel("NPS")
 
             case "LN Balance":
@@ -89,6 +92,7 @@ class MapPlotWidget(QWidget):
                 self.ax.set_ylabel("RC/LN Bias")
 
             case "Jack Intensity":
+                self.set_axisy(0, None)
                 self.ax.set_ylabel("Strain")
 
             case "Jack Balance":
@@ -96,6 +100,7 @@ class MapPlotWidget(QWidget):
                 self.ax.set_ylabel("Hand Bias")
 
             case "Asynchronous Releases":
+                self.set_axisy(0, None)
                 self.ax.set_ylabel("Strain")
 
         if len(diffs) > 0:
