@@ -70,6 +70,9 @@ class MainWindow(FramelessMainWindow):
     def load_folder(self, folder):
         """Load the song select menu."""
 
+        if folder == "":
+            return
+
         self.song_list.clear_songs()
         self.song_list.set_dir_list(listdir(folder))
         self.song_window.show()

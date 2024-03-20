@@ -6,11 +6,12 @@ This module contains a class definition for SongWindow.
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QCheckBox
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QPushButton
 from pydub import AudioSegment
 from Interface.map_plot_widget import MapPlotWidget
 from Interface.diff_item import DiffItem
 from Interface.slider_unclickable import SliderUnclickable
+from Interface.check_button import CheckButton
 from Statistician.difficulty import Difficulty
 
 class SongWindow(QWidget):
@@ -39,14 +40,20 @@ class SongWindow(QWidget):
             self.process_key
         )
 
+        self.sel_all = QPushButton(self)
+        self.sel_all.clicked.connect(self.diff_list.selectAll)
+
+        self.desel_all = QPushButton(self)
+        self.desel_all.clicked.connect(self.diff_list.clearSelection)
+
         self.plot_list = QListWidget(self)
         self.plot_list.itemSelectionChanged.connect(
             self.process_key
         )
 
-        self.label_diff = QLabel("Select difficulties\nto compare", self)
+        #self.label_diff = QLabel("Select difficulties\nto compare", self)
 
-        self.label_plot = QLabel("Select what\nto compare", self)
+        #self.label_plot = QLabel("Select what\nto compare", self)
 
         self.smoothing_slider = SliderUnclickable(Qt.Horizontal, self)
         self.smoothing_slider.valueChanged.connect(self.change_smoothing)
@@ -60,8 +67,8 @@ class SongWindow(QWidget):
         self.threshold2_slider.valueChanged.connect(self.change_threshold)
         self.threshold2_slider.sliderReleased.connect(self.process_key)
 
-        self.threshold_mode = QCheckBox(self)
-        self.threshold_mode.stateChanged.connect(self.process_key)
+        self.threshold_mode = CheckButton(self, "Alt. Calculator")
+        self.threshold_mode.state_changed.connect(self.process_key)
 
         self.label_smoothing = QLabel(f"Smoothing: {self.smoothing}ms", self)
 
@@ -79,6 +86,10 @@ class SongWindow(QWidget):
 
     def _init_ui(self):
         """Help to condense __init__ a little."""
+
+        diff_font = QFont("Nunito", 12)#14)
+        diff_font.setBold(True)
+
         self.setStyleSheet(
             """
             background-color: #2a2a2a;
@@ -323,22 +334,53 @@ class SongWindow(QWidget):
         self.diff_list.hide()
         self.widgets.append(self.diff_list)
 
-        diff_font = QFont("Nunito",14)
-        self.label_diff.setFont(diff_font)
-        self.label_diff.setAlignment(Qt.AlignCenter)
-        self.label_diff.setStyleSheet("""
-            color: #888888
-            """)
-        self.label_diff.hide()
-        self.widgets.append(self.label_diff)
+        self.sel_all.setText("All")
+        self.sel_all.setFont(diff_font)
+        self.sel_all.setStyleSheet("""
+            QPushButton {
+                background-color: #444444;
+                color: #dddddd;
+                border-radius: 5px;
+            }
 
-        self.label_plot.setFont(diff_font)
-        self.label_plot.setAlignment(Qt.AlignCenter)
-        self.label_plot.setStyleSheet("""
-            color: #888888
-            """)
-        self.label_plot.hide()
-        self.widgets.append(self.label_plot)
+            QPushButton:hover {
+                background-color: #666666;
+            }
+        """)
+        self.sel_all.hide()
+        self.widgets.append(self.sel_all)
+
+        self.desel_all.setText("None")
+        self.desel_all.setFont(diff_font)
+        self.desel_all.setStyleSheet("""
+            QPushButton {
+                background-color: #444444;
+                color: #dddddd;
+                border-radius: 5px;
+            }
+
+            QPushButton:hover {
+                background-color: #666666;
+            }
+        """)
+        self.desel_all.hide()
+        self.widgets.append(self.desel_all)
+
+        #self.label_diff.setFont(diff_font)
+        #self.label_diff.setAlignment(Qt.AlignCenter)
+        #self.label_diff.setStyleSheet("""
+        #    color: #888888
+        #    """)
+        #self.label_diff.hide()
+        #self.widgets.append(self.label_diff)
+
+        #self.label_plot.setFont(diff_font)
+        #self.label_plot.setAlignment(Qt.AlignCenter)
+        #self.label_plot.setStyleSheet("""
+        #    color: #888888
+        #    """)
+        #self.label_plot.hide()
+        #self.widgets.append(self.label_plot)
 
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
@@ -422,13 +464,7 @@ class SongWindow(QWidget):
         self.widgets.append(self.label_threshold2)
 
         self.threshold_mode.setFont(plot_font)
-        self.threshold_mode.setText("Alternate Calculator")
         self.threshold_mode.setFont(diff_font)
-        self.threshold_mode.setStyleSheet("""
-            QCheckBox { background-color: none;
-                        color: #888888 }
-        """)
-        self.threshold_mode.setChecked(True)
         self.threshold_mode.hide()
         self.widgets.append(self.threshold_mode)
 
@@ -646,11 +682,12 @@ class SongWindow(QWidget):
         dx, dy = w - 210, cy
         self.plot_list.setGeometry(dx, dy, 180, 180)
 
-        ey = dy - 60
-        self.label_diff.setGeometry(30, ey, 180, 60)
+        ey = dy - 50#60
+        #self.label_diff.setGeometry(30, ey, 180, 60)
 
         fx, fy = dx, ey
-        self.label_plot.setGeometry(fx, fy, 180, 60)
+        #self.label_plot.setGeometry(fx, fy, 180, 60)
+        self.threshold_mode.setGeometry(fx, fy, 180, 40)
 
         gw = w - 480
         gy = h - 50
@@ -686,5 +723,6 @@ class SongWindow(QWidget):
         height = (mh - 90) / mh
         self.plot.ax.set_position([left, bottom, width, height])
 
-        ny = h - 225
-        self.threshold_mode.setGeometry(240, ny, 240, 60)
+        ny = ey
+        self.sel_all.setGeometry(30, ny, 85, 40)
+        self.desel_all.setGeometry(125, ny, 85, 40)

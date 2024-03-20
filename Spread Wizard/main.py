@@ -16,7 +16,7 @@ def get_latest() -> str:
     return latest_version
 
 if __name__ == '__main__':
-    VERSION = '1.0'
+    VERSION = '1.1.0'
     LATEST = get_latest()
     app = QApplication(argv)
     HEIGHT = app.desktop().screenGeometry().height()
