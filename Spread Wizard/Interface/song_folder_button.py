@@ -22,18 +22,17 @@ class SongFolderButton(QPushButton):
         self.setStyleSheet(
             """
             QPushButton {
-                background-color: #111111;
+                background-color: #222222;
                 color: #f9d5ff;
                 border: none;
-                border-radius: 5px; }
+                border-radius: 10px; }
             QPushButton:hover {
-                background-color: #333333;
+                background-color: #444444;
                 color: #f9d5ff;
                 border: none; }
-            """
-            )
+            """)
 
-        self.folder_path = None
+        self.folder_path = ""
         self.clicked.connect(self.select_folder)
 
     def select_folder(self):

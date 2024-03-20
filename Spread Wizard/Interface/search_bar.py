@@ -15,7 +15,7 @@ class SearchBar(QWidget):
         super().__init__(parent)
 
         self.search_text = QTextEdit(self)
-        self.search_button = QPushButton(self, text="🔍")
+        self.search_button = QPushButton(self, text="⮨")
         self.search_button.pressed.connect(self.on_button_pressed)
         self.last_query = ""
 
@@ -27,13 +27,15 @@ class SearchBar(QWidget):
         font = QFont("Nunito", 8)
         font.setBold(True)
 
+        font2 = QFont("Nunito", 16)
+
         self.setStyleSheet(
             """
             background: transparent;
             """
         )
 
-        self.search_text.setPlaceholderText("     Search by metadata")
+        self.search_text.setPlaceholderText("Search by metadata...")
         self.search_text.setLineWrapMode(QTextEdit.NoWrap)
         self.search_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.search_text.setFont(font)
@@ -49,6 +51,7 @@ class SearchBar(QWidget):
             """
         )
 
+        self.search_button.setFont(font2)
         self.search_button.setStyleSheet(
             """
             QPushButton {
@@ -86,3 +89,9 @@ class SearchBar(QWidget):
         """Return the text in the search bar"""
 
         return self.last_query
+
+    def clear_query(self):
+        """Clear the last query"""
+
+        self.last_query = ""
+        self.search_text.setText("")

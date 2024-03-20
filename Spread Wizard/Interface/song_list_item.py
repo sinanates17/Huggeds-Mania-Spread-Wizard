@@ -73,7 +73,7 @@ class SongListItem(QListWidgetItem):
                 self.metadata = self.metadata + f"{word} "
 
         self.metadata = self.metadata.lower()
-        self.setText(f"{self.artist} - {self.title}\nby {self.mapper}")
+        self.setText(f"{self.artist} - {self.title}\n{self.mapper}")
 
     def folder(self) -> str:
         """Return the name of the song's folder"""
