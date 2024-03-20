@@ -40,3 +40,4 @@ class SongFolderButton(QPushButton):
 
         self.folder_path = askdirectory()
         self.folder_selected.emit(self.folder_path)
+
