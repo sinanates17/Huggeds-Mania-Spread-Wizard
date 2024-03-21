@@ -32,7 +32,7 @@ class MainWindow(FramelessMainWindow):
         self.font2 = QFont("Nunito", 16)
         #font2.setBold(True)
 
-        font3 = QFont("Nunito", 48)
+        font3 = QFont("Nunito", 32)
         font3.setBold(True)
 
         self.title = TitleBar(self)
@@ -77,14 +77,14 @@ class MainWindow(FramelessMainWindow):
         self.label_version.setFont(font1)
         self.label_version.setStyleSheet("color: #ab89b1;")
 
-        self.label_loading = QLabel(self, text="Processing folder, please wait...")
-        self.label_loading.setFont(font3)
-        self.label_loading.setAlignment(Qt.AlignCenter)
-        self.label_loading.setStyleSheet("""
-            background-color: rgba(0,0,0,0);
-            color: #aaaaaa;
-            border: none;
-        """)
+        #self.label_loading = QLabel(self, text="Processing folder, please wait...")
+        #self.label_loading.setFont(font3)
+        #self.label_loading.setAlignment(Qt.AlignCenter)
+        #self.label_loading.setStyleSheet("""
+        #    background-color: rgba(0,0,0,0);
+        #    color: #aaaaaa;
+        #    border: none;
+        #""")
         #self.label_loading.hide()
 
         if "cache.json" not in listdir():
@@ -106,7 +106,12 @@ class MainWindow(FramelessMainWindow):
     def load_folder(self, folder):
         """Load the song select menu."""
 
+        #self.label_loading.show()
+        #print(self.label_loading.isHidden())
+
         if folder == "":
+            #self.label_loading.hide()
+            #print(self.label_loading.isHidden())
             return
 
         self.song_list.clear_songs()
@@ -115,8 +120,6 @@ class MainWindow(FramelessMainWindow):
         self.song_list.show()
         self.search_bar.show()
         self.refresh_button.show()
-        print("show")
-        self.label_loading.show()
 
         self.search_bar.clear_query()
 
@@ -134,8 +137,8 @@ class MainWindow(FramelessMainWindow):
             self.generate_song_items()
             self.add_songs()
 
-        print("hide")
-        self.label_loading.hide()
+        #self.label_loading.hide()
+        #print(self.label_loading.isHidden())
 
     def add_songs(self):
         """Connected to song_list.max_increased"""
@@ -195,7 +198,7 @@ class MainWindow(FramelessMainWindow):
             self.label_version.setText(f"Version {current}. You are up to date!")
         else:
             self.label_version.setOpenExternalLinks(True)
-            self.label_version.setText(f"Version {current} is outdated. Download the latest version, {latest}, <a href=\"http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest\"> <font face=Nunito color=white> here</font></a>.")  #http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest)
+            self.label_version.setText(f"Version {current} is outdated. Download the latest version, {latest}, <a href=\"http://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/releases/latest\"> <font face=Nunito color=white> here</font></a>.")
 
     def setGeometry(self, ax: int, ay: int, aw: int, ah: int):
         """Modify setGeometry method to handle child widgets"""
@@ -209,9 +212,9 @@ class MainWindow(FramelessMainWindow):
 
         self.title.setGeometry(0, 0, w, 30)
 
-        bx, by = int(w / 2) - 120, int(h / 2) - 40
+        bx, by = int(w / 2) - 180, int(h / 2) - 40
         if self.folder_path == "":
-            self.folder_button.setGeometry(bx, by, 240, 80)
+            self.folder_button.setGeometry(bx, by, 360, 80)
 
         else:
             self.folder_button.setGeometry(140, 110, 100, 40)
@@ -233,5 +236,5 @@ class MainWindow(FramelessMainWindow):
 
         self.refresh_button.setGeometry(30, 110, 100, 40)
 
-        fh = h - 30
-        self.label_loading.setGeometry(0, 30, w, fh)
+        #fh = h - 30
+        #self.label_loading.setGeometry(0, 30, w, fh)

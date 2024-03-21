@@ -5,6 +5,7 @@ from tkinter.filedialog import askdirectory
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import pyqtSignal
+from os import listdir, path
 
 class SongFolderButton(QPushButton):
     """Define a QPushButton to act as a song folder select button."""
@@ -12,7 +13,7 @@ class SongFolderButton(QPushButton):
     folder_selected = pyqtSignal(str)
 
     def __init__(self, parent):
-        super().__init__(parent, text="🗀 Select Songs Folder")
+        super().__init__(parent, text="🗀 Select Songs Folder.\nLarge folders will take a while to load.")
 
         self.parent = parent
 
@@ -39,5 +40,13 @@ class SongFolderButton(QPushButton):
         """Open a file browser to select a song folder."""
 
         self.folder_path = askdirectory()
-        self.folder_selected.emit(self.folder_path)
+        try:
+            for file in listdir(self.folder_path):
+                if path.isdir(f"{self.folder_path}/{file}"):
+                    for file_ in listdir(f"{self.folder_path}/{file}"):
+                        pass
 
+            self.folder_selected.emit(self.folder_path)
+
+        except PermissionError:
+            self.setText("🗀 Select Songs Folder.\nCannot access that folder.")
