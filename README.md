@@ -14,14 +14,11 @@
 
   ![](https://media1.tenor.com/m/F-LgB1xTebEAAAAd/look-at-this-graph-nickelback.gif)
 
-### Plans and Problems (In No Particular Order)
-- Remove FFmpeg dependency
-- Beatmap search function
+### Plans
 - Unfuck Windows Scaling causing giant text in the app
 - Bracket detection
 - Shield/reverse shield detection
 - Per-column strain
-- Figure out a better way to compile the app to make a smaller .exe
 - In-app audio player that traces along the graph.
 - Optimization
 
