@@ -14,7 +14,7 @@
 
   ![](https://media1.tenor.com/m/F-LgB1xTebEAAAAd/look-at-this-graph-nickelback.gif)
 
-### Plans
+## Plans
 - Unfuck Windows Scaling causing giant text in the app
 - Bracket detection
 - Shield/reverse shield detection
