@@ -8,6 +8,7 @@ from copy import deepcopy
 from pyqt_frameless_window import FramelessMainWindow
 from PyQt5.QtWidgets import QLabel, QPushButton
 from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
@@ -30,6 +31,9 @@ class MainWindow(FramelessMainWindow):
 
         self.font2 = QFont("Nunito", 16)
         #font2.setBold(True)
+
+        font3 = QFont("Nunito", 48)
+        font3.setBold(True)
 
         self.title = TitleBar(self)
 
@@ -73,6 +77,16 @@ class MainWindow(FramelessMainWindow):
         self.label_version.setFont(font1)
         self.label_version.setStyleSheet("color: #ab89b1;")
 
+        self.label_loading = QLabel(self, text="Processing folder, please wait...")
+        self.label_loading.setFont(font3)
+        self.label_loading.setAlignment(Qt.AlignCenter)
+        self.label_loading.setStyleSheet("""
+            background-color: rgba(0,0,0,0);
+            color: #aaaaaa;
+            border: none;
+        """)
+        #self.label_loading.hide()
+
         if "cache.json" not in listdir():
             with open("cache.json", "x", encoding="utf8") as f:
                 data = {"folder_path": ""}
@@ -101,6 +115,8 @@ class MainWindow(FramelessMainWindow):
         self.song_list.show()
         self.search_bar.show()
         self.refresh_button.show()
+        print("show")
+        self.label_loading.show()
 
         self.search_bar.clear_query()
 
@@ -117,6 +133,9 @@ class MainWindow(FramelessMainWindow):
         else:
             self.generate_song_items()
             self.add_songs()
+
+        print("hide")
+        self.label_loading.hide()
 
     def add_songs(self):
         """Connected to song_list.max_increased"""
@@ -213,3 +232,6 @@ class MainWindow(FramelessMainWindow):
         self.search_bar.setGeometry(30, 60, 210, 40)
 
         self.refresh_button.setGeometry(30, 110, 100, 40)
+
+        fh = h - 30
+        self.label_loading.setGeometry(0, 30, w, fh)
