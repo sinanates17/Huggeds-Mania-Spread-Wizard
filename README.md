@@ -10,6 +10,8 @@
 ## About
   Spread Wizard is a modding tool for osu!mania that allows the user to graph certain characteristics of difficulties in a mapset next to each other for comparison. This application is **NOT** a problem detector. It's meant to provide general diagnostic information about the difficulties in a mapset to aid the modder in finding issues. It's only as useful as how well the modder knows what they're looking for. Please read the documentation for how the different graphs work (scroll down).
 
+Yeah, the UI was inspired by Mapset Verifier.
+
   ![](https://media1.tenor.com/m/F-LgB1xTebEAAAAd/look-at-this-graph-nickelback.gif)
 
 ## Plans
