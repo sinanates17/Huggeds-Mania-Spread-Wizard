@@ -1,4 +1,4 @@
-# Spread Wizard
+# Spread Wizard (READ INSTALLATION INSTRUCTIONS PLEASE)
 
 ## How to Install
 
