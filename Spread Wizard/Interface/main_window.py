@@ -8,7 +8,7 @@ from copy import deepcopy
 from pyqt_frameless_window import FramelessMainWindow
 from PyQt5.QtWidgets import QLabel, QPushButton
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
+#from PyQt5.QtCore import Qt
 from Interface.title_bar import TitleBar #Import is being called from the root folder.
 from Interface.song_folder_button import SongFolderButton
 from Interface.song_list import SongList
@@ -238,3 +238,8 @@ class MainWindow(FramelessMainWindow):
 
         #fh = h - 30
         #self.label_loading.setGeometry(0, 30, w, fh)
+
+    def set_icon(self, path_):
+        """Set the title bar icon"""
+
+        self.title.set_icon(path_)

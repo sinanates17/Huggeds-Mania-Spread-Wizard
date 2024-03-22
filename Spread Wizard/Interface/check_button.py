@@ -13,14 +13,13 @@ class CheckButton(QPushButton):
         super().__init__(parent)
 
         self.setText(text)
-        self.checked = False
+        self.checked = True
         self.clicked.connect(self.toggle_checked)
         self.setStyleSheet("""
                 QPushButton {
-                    background-color: #444444;
-                    color: #dddddd;
+                    background-color: #888888;
+                    color: #000000;
                     border-radius: 5px;
-                    border: none;
                 }
 
                 QPushButton:hover {

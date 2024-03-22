@@ -2,7 +2,7 @@
 
 # pylint: disable=E0611
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QSizePolicy, QHBoxLayout
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt
 
 class TitleBar(QWidget):
@@ -26,16 +26,17 @@ class TitleBar(QWidget):
         layout.setSpacing(0)
 
         # Add a spacer to push the buttons to the right
-        #left_spacer = QLabel(self)
-        #left_spacer.setStyleSheet("background-color: #222222;")
-        #left_spacer.setFixedSize(120,40)
-        #layout.addWidget(left_spacer)
+        self.left_spacer = QLabel(self)
+        self.left_spacer.setStyleSheet("background-color: #222222;")
+        self.left_spacer.setFixedSize(30,30)
+        self.left_spacer.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.left_spacer)
 
         self.spacer = QLabel(self)
         self.spacer.setStyleSheet("background-color: #222222; color: #f9d5ff;")
         self.spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.spacer.setFixedHeight(30)
-        self.spacer.setText("  Spread Wizard by Hugged")
+        self.spacer.setText("Spread Wizard by Hugged")
         self.spacer.setFont(font)
         self.spacer.setAlignment(Qt.AlignVCenter)
         layout.addWidget(self.spacer)
@@ -107,3 +108,8 @@ class TitleBar(QWidget):
         else:
             self.parent().showMaximized()
             self.maximize_button.setText("❐")
+
+    def set_icon(self, path):
+        """Set the icon"""
+        icon = QPixmap(path)
+        self.left_spacer.setPixmap(icon.scaled(20,20))
