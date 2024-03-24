@@ -3,6 +3,7 @@
 # pylint: disable=E0611,C0103
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import Qt
 
 class CheckButton(QPushButton):
     """A QPushButton that acts like a check box"""
@@ -18,8 +19,9 @@ class CheckButton(QPushButton):
         self.setStyleSheet("""
                 QPushButton {
                     background-color: #888888;
-                    color: #000000;
+                    color: #111111;
                     border-radius: 5px;
+                    text-align: center;
                 }
 
                 QPushButton:hover {
@@ -37,6 +39,7 @@ class CheckButton(QPushButton):
                     background-color: #444444;
                     color: #dddddd;
                     border-radius: 5px;
+                    text-align: center;
                 }
 
                 QPushButton:hover {
@@ -49,8 +52,9 @@ class CheckButton(QPushButton):
             self.setStyleSheet("""
                 QPushButton {
                     background-color: #888888;
-                    color: #000000;
+                    color: #111111;
                     border-radius: 5px;
+                    text-align: center;
                 }
 
                 QPushButton:hover {

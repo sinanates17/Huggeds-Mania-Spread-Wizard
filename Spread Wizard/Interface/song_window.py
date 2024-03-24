@@ -5,7 +5,7 @@ This module contains a class definition for SongWindow.
 # pylint: disable=E0611,W0107,C0301,C0103
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QPushButton
 from pydub import AudioSegment
@@ -23,8 +23,8 @@ class SongWindow(QWidget):
 
         self.diff_checkboxes = []
         self.widgets = []
-        self.smoothing = 3000 #+- time in ms to take a rolling average in the diff plots.
-        self.sample_interval = 1200 # Every x ms, sample the raw data to calculate a rolling average.
+        self.smoothing = 1500 #+- time in ms to take a rolling average in the diff plots.
+        self.sample_interval = 600 # Every x ms, sample the raw data to calculate a rolling average.
                                   #     Scales with smoothing to alleviate computational load.
         self.threshold = 200 #Multi-use parameter depending on what graph is shown
         self.threshold2 = 200
@@ -84,6 +84,16 @@ class SongWindow(QWidget):
         self.thresh2_desc = ""
 
         self.audio_player = QMediaPlayer(self)
+
+        self.audio_scrubber = SliderUnclickable(Qt.Horizontal, self)
+
+        self.audio_volume = SliderUnclickable(Qt.Horizontal, self)
+        self.audio_volume.valueChanged.connect(self.audio_player.setVolume)
+
+        self.audio_button = CheckButton(self, "⏵")
+        self.audio_button.state_changed.connect(self.on_audio_button)
+
+        self.audio_timer = QTimer(self)
 
         self._init_ui()
 
@@ -387,7 +397,7 @@ class SongWindow(QWidget):
 
         self.smoothing_slider.setMinimum(3)
         self.smoothing_slider.setMaximum(100)
-        self.smoothing_slider.setValue(30)
+        self.smoothing_slider.setValue(15)
         self.smoothing_slider.setStyleSheet(
             """
             QSlider::groove:horizontal {
@@ -483,6 +493,38 @@ class SongWindow(QWidget):
         self.plot.hide()
         self.widgets.append(self.plot)
 
+        self.audio_scrubber.setStyleSheet(
+            """
+            QSlider::groove:horizontal {
+                background: #111111;
+                height: 14px;
+                border-radius: 7px;
+            }
+            QSlider::handle:horizontal {
+                background: #dddddd;
+                height: 14px;
+                width: 14px;
+                border-radius: 7px;
+            }
+            """
+        )
+        self.audio_scrubber.setMinimum(0)
+        self.audio_scrubber.hide()
+        self.widgets.append(self.audio_scrubber)
+
+        self.audio_volume.setMinimum(0)
+        self.audio_volume.setMaximum(100)
+        self.audio_volume.setValue(50)
+        self.audio_volume.hide()
+        self.widgets.append(self.audio_volume)
+
+        self.audio_timer.setInterval(17)
+        #self.audio_timer.timeout.connect(self.update_scrubber)
+
+        self.audio_button.setFont(creator_font)
+        self.audio_button.hide()
+        self.widgets.append(self.audio_button)
+
     # pylint: disable=C0103,W0613
     def paintEvent(self, pe): #IDK How this works, but it needs to be here for style sheets to work.
         """Overwrite parent's paintEvent."""
@@ -536,6 +578,10 @@ class SongWindow(QWidget):
             media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
             self.audio_player.setMedia(media)
             self.length = AudioSegment.from_file(self.audio_path).duration_seconds * 1000 #Extract the length in ms of the mapset's audio.
+
+            self.audio_scrubber.setMaximum(int(self.length))
+            if self.audio_button.isChecked():
+                self.audio_button.toggle_checked()
 
             self.process_key()
 
@@ -731,3 +777,28 @@ class SongWindow(QWidget):
         ny = ey
         self.sel_all.setGeometry(30, ny, 85, 40)
         self.desel_all.setGeometry(125, ny, 85, 40)
+
+        ow = gw
+        oy = ny
+        self.audio_scrubber.setGeometry(240, oy, ow, 20)
+
+        px, py = int(w / 2) - 45, oy + 30
+        self.audio_button.setGeometry(240, py, 40, 40)
+
+    def on_audio_button(self):
+        """Handle toggling audio playback"""
+
+        if self.audio_button.isChecked():
+            self.audio_button.setText("⏸")
+            self.audio_player.play()
+            self.audio_timer.start()
+
+        elif not self.audio_button.isChecked():
+            self.audio_button.setText("⏵")
+            self.audio_player.pause()
+            self.audio_timer.stop()
+
+    def update_volume(self, v): #Currently unused
+        """Handle adjustign playback volume"""
+
+        self.audio_player.setVolume(v)

@@ -8,6 +8,7 @@ from requests import get
 from PyQt5.QtWidgets import QApplication, QSplashScreen, QMainWindow, QLabel
 from PyQt5.QtGui import QPixmap, QIcon
 from Interface.main_window import MainWindow
+from Interface.no_ffmpeg_error import NoFFmpegError
 
 def get_latest() -> str:
     """Return the latest version of the application."""
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     try:
         check = run("where ffmpeg", shell=True, capture_output=True, text=True).stdout
         if check == "":
-            raise Exception
+            raise NoFFmpegError
 
         VERSION = '1.1.1'
         LATEST = get_latest()
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         window.setGeometry(100, 100, W, H)
         window.show()
 
-    except Exception:
+    except NoFFmpegError:
         warning = QMainWindow()
         warn_label = QLabel(warning, text="You need FFmpeg! Read the damn <a href=\"https://github.com/sinanates17/Huggeds-Mania-Spread-Wizard/tree/main?tab=readme-ov-file#how-to-install\">README</a>!")
         warn_label.setOpenExternalLinks(True)
