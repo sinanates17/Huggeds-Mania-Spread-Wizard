@@ -5,7 +5,8 @@ This module contains a class definition for SongWindow.
 # pylint: disable=E0611,W0107,C0301,C0103
 from os import listdir
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QPushButton
 from pydub import AudioSegment
 from Interface.map_plot_widget import MapPlotWidget
@@ -81,6 +82,8 @@ class SongWindow(QWidget):
         self.thresh1_desc = ""
 
         self.thresh2_desc = ""
+
+        self.audio_player = QMediaPlayer(self)
 
         self._init_ui()
 
@@ -389,14 +392,14 @@ class SongWindow(QWidget):
             """
             QSlider::groove:horizontal {
                 background: #666666;
-                height: 20px;
-                border-radius: 10px;
+                height: 14px;
+                border-radius: 7px;
             }
             QSlider::handle:horizontal {
                 background: #dddddd;
-                height: 20px;
-                width: 20px;
-                border-radius: 10px;
+                height: 14px;
+                width: 14px;
+                border-radius: 7px;
             }
             """
         )
@@ -410,14 +413,14 @@ class SongWindow(QWidget):
             """
             QSlider::groove:horizontal {
                 background: #666666;
-                height: 20px;
-                border-radius: 10px;
+                height: 14px;
+                border-radius: 7px;
             }
             QSlider::handle:horizontal {
                 background: #dddddd;
-                height: 20px;
-                width: 20px;
-                border-radius: 10px;
+                height: 14px;
+                width: 14px;
+                border-radius: 7px;
             }
             """
         )
@@ -440,14 +443,14 @@ class SongWindow(QWidget):
             """
             QSlider::groove:horizontal {
                 background: #666666;
-                height: 20px;
-                border-radius: 10px;
+                height: 14px;
+                border-radius: 7px;
             }
             QSlider::handle:horizontal {
                 background: #dddddd;
-                height: 20px;
-                width: 20px;
-                border-radius: 10px;
+                height: 14px;
+                width: 14px;
+                border-radius: 7px;
             }
             """
         )
@@ -530,6 +533,8 @@ class SongWindow(QWidget):
             self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
             self.audio_path = f"{song_path}/{ref.audio()}"
 
+            media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
+            self.audio_player.setMedia(media)
             self.length = AudioSegment.from_file(self.audio_path).duration_seconds * 1000 #Extract the length in ms of the mapset's audio.
 
             self.process_key()
@@ -690,27 +695,27 @@ class SongWindow(QWidget):
         self.threshold_mode.setGeometry(fx, fy, 180, 40)
 
         gw = w - 480
-        gy = h - 50
+        gy = h - 44
         self.smoothing_slider.setGeometry(240, gy, gw, 20)
 
         hw = gw
-        hy = gy - 50
+        hy = gy - 44
         self.threshold_slider.setGeometry(240, hy, hw, 20)
 
         iw = gw
-        iy = hy - 50
+        iy = hy - 44
         self.threshold2_slider.setGeometry(240, iy, iw, 20)
 
         jw = gw
-        jy = gy - 35
+        jy = gy - 32
         self.label_smoothing.setGeometry(240, jy, jw, 40)
 
         kw = gw
-        ky = jy - 50
+        ky = jy - 44
         self.label_threshold.setGeometry(240, ky, kw, 40)
 
         lw = gw
-        ly = ky - 50
+        ly = ky - 44
         self.label_threshold2.setGeometry(240, ly, lw, 40)
 
         mw, mh = w + 16, h - 370
