@@ -4,7 +4,8 @@ This module contains a class definition for SongWindow.
 
 # pylint: disable=E0611,W0107,C0301,C0103
 from os import listdir
-from PyQt5.QtGui import QPainter, QFont, QColor, QPen
+from pathos.multiprocessing import ProcessingPool
+from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QDesktopServices
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle, QLabel, QListWidget, QListWidgetItem, QAbstractItemView, QScrollBar, QPushButton
@@ -30,6 +31,8 @@ class SongWindow(QWidget):
         self.threshold2 = 200
         self.audio_path = ''
         self.length = 0
+
+        #self.worker = ProcessingPool()
 
         #Create all child widgets then run _init_ui to set them up
         self.label_title = QLabel(self)
@@ -84,16 +87,26 @@ class SongWindow(QWidget):
         self.thresh2_desc = ""
 
         self.audio_player = QMediaPlayer(self)
+        #self.audio_player.setNotifyInterval(20)
+        #self.audio_player.positionChanged.connect(self.while_playing)
 
         self.audio_scrubber = SliderUnclickable(Qt.Horizontal, self)
+        self.audio_scrubber.valueChanged.connect(self.seek)
 
         self.audio_volume = SliderUnclickable(Qt.Horizontal, self)
         self.audio_volume.valueChanged.connect(self.audio_player.setVolume)
 
         self.audio_button = CheckButton(self, "⏵")
-        self.audio_button.state_changed.connect(self.on_audio_button)
+        self.audio_button.state_changed.connect(self.toggle_playback)
+
+        self.audio_mute = CheckButton(self, "🕪")
+        self.audio_mute.state_changed.connect(self.toggle_mute)
 
         self.audio_timer = QTimer(self)
+        self.audio_timer.timeout.connect(self.while_playing)
+
+        self.audio_timestamp = QPushButton(self)
+        self.audio_timestamp.pressed.connect(lambda: self.open_timestamp(self.audio_timestamp.text()))
 
         self._init_ui()
 
@@ -515,6 +528,21 @@ class SongWindow(QWidget):
         self.audio_volume.setMinimum(0)
         self.audio_volume.setMaximum(100)
         self.audio_volume.setValue(50)
+        self.audio_volume.setStyleSheet(
+            """
+            QSlider::groove:horizontal {
+                background: #666666;
+                height: 14px;
+                border-radius: 7px;
+            }
+            QSlider::handle:horizontal {
+                background: #dddddd;
+                height: 14px;
+                width: 14px;
+                border-radius: 7px;
+            }
+            """
+        )
         self.audio_volume.hide()
         self.widgets.append(self.audio_volume)
 
@@ -524,6 +552,29 @@ class SongWindow(QWidget):
         self.audio_button.setFont(creator_font)
         self.audio_button.hide()
         self.widgets.append(self.audio_button)
+
+        self.audio_mute.setFont(creator_font)
+        self.audio_mute.toggle_checked()
+        self.audio_mute.hide()
+        self.widgets.append(self.audio_mute)
+
+        self.audio_timestamp.setFont(diff_font)
+        self.audio_timestamp.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #444444;
+                color: #dddddd;
+                border-radius: 5px;
+            }
+
+            QPushButton:hover {
+                background-color: #666666;
+            }
+            """
+        )
+        self.audio_timestamp.setText("00:00:000")
+        self.audio_timestamp.hide()
+        self.widgets.append(self.audio_timestamp)
 
     # pylint: disable=C0103,W0613
     def paintEvent(self, pe): #IDK How this works, but it needs to be here for style sheets to work.
@@ -548,6 +599,7 @@ class SongWindow(QWidget):
         """Load in all the functional stuff when a song is selected."""
 
         self.diff_list.clear()
+        self.audio_scrubber.setValue(0)
 
         self.diff_checkboxes = []
 
@@ -718,7 +770,7 @@ class SongWindow(QWidget):
     def resize_children(self, w: int, h: int):
         """Handle resizing child widgets"""
 
-        w = 700 if w < 700 else w
+        w = 900 if w < 900 else w
         h = 700 if h < 700 else h
 
         aw = w - 60
@@ -782,10 +834,19 @@ class SongWindow(QWidget):
         oy = ny
         self.audio_scrubber.setGeometry(240, oy, ow, 20)
 
-        px, py = int(w / 2) - 45, oy + 30
-        self.audio_button.setGeometry(240, py, 40, 40)
+        px, py = int(w / 2) - 145, oy + 30
+        self.audio_button.setGeometry(px, py, 40, 40)
 
-    def on_audio_button(self):
+        qx, qy = px + 50, py + 10
+        self.audio_volume.setGeometry(qx, qy, 80, 20)
+
+        rx, ry = qx + 90, py
+        self.audio_mute.setGeometry(rx, ry, 40, 40)
+
+        sx, sy = rx + 50, ry
+        self.audio_timestamp.setGeometry(sx, sy, 100, 40)
+
+    def toggle_playback(self):
         """Handle toggling audio playback"""
 
         if self.audio_button.isChecked():
@@ -797,8 +858,61 @@ class SongWindow(QWidget):
             self.audio_button.setText("⏵")
             self.audio_player.pause()
             self.audio_timer.stop()
+            self.while_playing()
 
     def update_volume(self, v): #Currently unused
         """Handle adjustign playback volume"""
 
         self.audio_player.setVolume(v)
+
+    def while_playing(self):
+        """Do these while the audio player is playing"""
+
+        v = self.audio_player.position()
+
+        worker = ProcessingPool()
+
+        self.audio_scrubber.blockSignals(True)
+        self.audio_scrubber.setValue(v)
+        t = self.timestamp_form(v)
+        self.audio_timestamp.setText(t)
+        self.plot.trace_time(v / 1000)
+        self.audio_scrubber.blockSignals(False)
+
+    def seek(self, v):
+        """Connected to the audio scrubber"""
+
+        self.audio_player.setPosition(v)
+        t = self.timestamp_form(v)
+        self.audio_timestamp.setText(t)
+        self.plot.trace_time(v / 1000)
+
+    def toggle_mute(self):
+        """Connected to the mute button"""
+
+        if self.audio_mute.isChecked():
+            self.audio_mute.setText("🕨")
+            self.audio_player.setMuted(True)
+
+        elif not self.audio_mute.isChecked():
+            self.audio_mute.setText("🕪")
+            self.audio_player.setMuted(False)
+
+    def open_timestamp(self, timestamp):
+        """Open the timestamp in osu"""
+
+        url = QUrl(f"osu://edit/{timestamp}")
+        QDesktopServices.openUrl(url)
+
+    def timestamp_form(self, t: int) -> str:
+        """Convert a timestamp in ms to mm:ss:msms format"""
+
+        ms = t % 1000
+        s = int(t / 1000) % 60
+        m = int(t / 60000)
+
+        ms = "000" if ms == 0 else (f"00{ms}" if ms <= 9 else (f"0{ms}" if ms <= 99 else str(ms)))
+        s = f"0{s}" if s <= 9 else str(s)
+        m = f"0{m}" if m <= 9 else str(m)
+
+        return f"{m}:{s}:{ms}"

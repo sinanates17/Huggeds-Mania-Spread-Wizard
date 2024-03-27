@@ -3,7 +3,7 @@
 # pylint: disable=E0611,C0103
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import Qt
+#from PyQt5.QtCore import Qt
 
 class CheckButton(QPushButton):
     """A QPushButton that acts like a check box"""
@@ -67,3 +67,8 @@ class CheckButton(QPushButton):
     def isChecked(self) -> bool:
         """Override super()'s isChecked method"""
         return self.checked
+
+    def setChecked(self, a0: bool):
+        "Override setChecked"
+
+        self.checked = a0

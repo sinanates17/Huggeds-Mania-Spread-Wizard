@@ -38,7 +38,7 @@ if __name__ == '__main__':
         LATEST = get_latest()
         HEIGHT = app.desktop().screenGeometry().height()
         W, H = int((HEIGHT * .6) * 1.6), int(HEIGHT * .6)
-        W = 1000 if W < 1000 else W
+        W = 1200 if W < 1200 else W
         H = 790 if H < 790 else H
 
         window = MainWindow()

@@ -2,6 +2,7 @@
 
 # pylint: disable=E0611,W0107,C0301,C0103
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
+#from pathos.multiprocessing import ProcessingPool
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 #from matplotlib.backends.backend_gtk3 import (
     #NavigationToolbar2GTK3 as NavigationToolbar)
@@ -29,11 +30,15 @@ class MapPlotWidget(QWidget):
         self.ax.spines['top'].set_color('white')
         self.ax.spines['bottom'].set_color('white')
 
+        self.tracer = self.ax.axvline(0)
+
         layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(self.fig)
         self.canvas.blit()
         self.canvas.setStyleSheet("background-color: transparent;")
         layout.addWidget(self.canvas)
+
+        #self.pool = ProcessingPool()
 
     def set_axisx(self, lim0, lim1):
         """Set x axis from 0 to lim"""
@@ -112,3 +117,15 @@ class MapPlotWidget(QWidget):
         self.ax.grid(visible=True, which='major', axis='both', color='#444444')
         self.ax.grid(visible=True, which='minor', axis='both', color='#222222')
         self.fig.canvas.draw()
+
+    def trace_time(self, t: int):
+        """Draw a vertical line to trace the timestamp"""
+
+        print("Test")
+        #pylint: disable=E0203
+        if hasattr(self, "tracer"):
+            self.tracer.remove()
+
+        self.tracer = self.ax.axvline(t, color='white')
+        self.fig.canvas.draw()
+
