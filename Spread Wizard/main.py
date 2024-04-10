@@ -3,7 +3,6 @@
 # pylint: disable=E0611, E0401
 import os
 import sys
-from atexit import register
 from shutil import rmtree
 from subprocess import run
 from requests import get
@@ -21,19 +20,16 @@ def get_latest() -> str:
 
     return latest_version
 
-def cleanup():
-    """Delete temp folder if present"""
-
-    rmtree("temp")
-
 if __name__ == '__main__':
 
     os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
+    if "temp" in os.listdir():
+        rmtree("temp")
+
     os.mkdir("temp")
 
     app = QApplication(sys.argv)
-    app.aboutToQuit.connect(cleanup)
 
     ICON_PATH = os.path.join("Resources/icon.ico")#sys._MEIPASS, "Resources/icon.ico")
     SPLASH_PATH = os.path.join("Resources/splash.png")#sys._MEIPASS, "Resources/splash.png")

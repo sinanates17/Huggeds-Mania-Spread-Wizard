@@ -109,6 +109,8 @@ class SongWindow(QWidget):
         self.audio_timestamp = QPushButton(self)
         self.audio_timestamp.pressed.connect(lambda: self.open_timestamp(self.audio_timestamp.text()))
 
+        self.audio_media = QMediaContent()
+
         self._init_ui()
 
     def _init_ui(self):
@@ -630,12 +632,12 @@ class SongWindow(QWidget):
             self.audio_path = f"{song_path}/{ref.audio()}"
 
             if self.audio_path.endswith(".ogg"):
-                media = QMediaContent(QUrl.fromLocalFile(self.ogg_to_mp3(self.audio_path)))
+                self.audio_media = QMediaContent(QUrl.fromLocalFile(self.ogg_to_mp3(self.audio_path)))
 
             else:
-                media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
+                self.audio_media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
 
-            self.audio_player.setMedia(media)
+            self.audio_player.setMedia(self.audio_media)
             self.length = AudioSegment.from_file(self.audio_path).duration_seconds * 1000 #Extract the length in ms of the mapset's audio.
 
             self.audio_scrubber.setMaximum(int(self.length))
@@ -904,7 +906,7 @@ class SongWindow(QWidget):
         """Connected to the audio scrubber"""
 
         self.audio_player.setPosition(v)
-        self.audio_player.stop()
+        #self.audio_player.stop()
         t = self.timestamp_form(v)
         self.audio_timestamp.setText(t)
         v = self.length if v > self.length else v
