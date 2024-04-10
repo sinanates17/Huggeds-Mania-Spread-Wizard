@@ -3,6 +3,8 @@
 # pylint: disable=E0611, E0401
 import os
 import sys
+from atexit import register
+from shutil import rmtree
 from subprocess import run
 from requests import get
 from PyQt5.QtWidgets import QApplication, QSplashScreen, QMainWindow, QLabel
@@ -19,12 +21,22 @@ def get_latest() -> str:
 
     return latest_version
 
+def cleanup():
+    """Delete temp folder if present"""
+
+    rmtree("temp")
+
 if __name__ == '__main__':
 
-    app = QApplication(sys.argv)
+    os.environ['QT_MULTIMEDIA_PREFERRED_PLUGINS'] = 'windowsmediafoundation'
 
-    ICON_PATH = os.path.join("icon.ico")#sys._MEIPASS, "icon.ico")
-    SPLASH_PATH = os.path.join("splash.png")#sys._MEIPASS, "splash.png")
+    os.mkdir("temp")
+
+    app = QApplication(sys.argv)
+    app.aboutToQuit.connect(cleanup)
+
+    ICON_PATH = os.path.join("Resources/icon.ico")#sys._MEIPASS, "Resources/icon.ico")
+    SPLASH_PATH = os.path.join("Resources/splash.png")#sys._MEIPASS, "Resources/splash.png")
 
     splash = QSplashScreen(QPixmap(SPLASH_PATH))
     splash.show()
@@ -34,7 +46,7 @@ if __name__ == '__main__':
         if check == "":
             raise NoFFmpegError
 
-        VERSION = '1.1.1'
+        VERSION = '1.2.0'
         LATEST = get_latest()
         HEIGHT = app.desktop().screenGeometry().height()
         W, H = int((HEIGHT * .6) * 1.6), int(HEIGHT * .6)
@@ -56,4 +68,5 @@ if __name__ == '__main__':
 
     app.setWindowIcon(QIcon(ICON_PATH))
     splash.close()
+
     sys.exit(app.exec_())

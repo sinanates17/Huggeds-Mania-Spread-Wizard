@@ -30,13 +30,14 @@ class MapPlotWidget(QWidget):
         self.ax.spines['top'].set_color('white')
         self.ax.spines['bottom'].set_color('white')
 
-        self.tracer = self.ax.axvline(0)
-
         layout = QVBoxLayout(self)
         self.canvas = FigureCanvas(self.fig)
         self.canvas.blit()
         self.canvas.setStyleSheet("background-color: transparent;")
         layout.addWidget(self.canvas)
+
+        self.tracer = QWidget(self)
+        self.tracer.setStyleSheet("background-color: white;")
 
         #self.pool = ProcessingPool()
 
@@ -121,11 +122,22 @@ class MapPlotWidget(QWidget):
     def trace_time(self, t: int):
         """Draw a vertical line to trace the timestamp"""
 
-        print("Test")
         #pylint: disable=E0203
-        if hasattr(self, "tracer"):
-            self.tracer.remove()
+        #if hasattr(self, "tracer"):
+        #    self.tracer.remove()
 
-        self.tracer = self.ax.axvline(t, color='white')
-        self.fig.canvas.draw()
+        #self.tracer = self.ax.axvline(t, color='white')
+        #self.fig.canvas.draw()
 
+        w = self.size().width() - 107
+        lim = self.ax.get_xlim()[1]
+        x = 68 + int(w * t / lim)
+        self.tracer.move(x, 38)
+
+    def setGeometry(self, x: int, y: int, w: int, h: int):
+        """Override setGeometry"""
+
+        super().setGeometry(x, y, w, h)
+
+        ah = h - 104
+        self.tracer.setFixedSize(1, ah)

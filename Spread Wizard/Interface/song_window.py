@@ -3,8 +3,8 @@ This module contains a class definition for SongWindow.
 """
 
 # pylint: disable=E0611,W0107,C0301,C0103
+import tempfile
 from os import listdir
-from pathos.multiprocessing import ProcessingPool
 from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QDesktopServices
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -92,6 +92,7 @@ class SongWindow(QWidget):
 
         self.audio_scrubber = SliderUnclickable(Qt.Horizontal, self)
         self.audio_scrubber.valueChanged.connect(self.seek)
+        #self.audio_scrubber.valueChanged.connect(self.audio_player.setPosition)
 
         self.audio_volume = SliderUnclickable(Qt.Horizontal, self)
         self.audio_volume.valueChanged.connect(self.audio_player.setVolume)
@@ -546,7 +547,7 @@ class SongWindow(QWidget):
         self.audio_volume.hide()
         self.widgets.append(self.audio_volume)
 
-        self.audio_timer.setInterval(17)
+        self.audio_timer.setInterval(33)
         #self.audio_timer.timeout.connect(self.update_scrubber)
 
         self.audio_button.setFont(creator_font)
@@ -600,6 +601,7 @@ class SongWindow(QWidget):
 
         self.diff_list.clear()
         self.audio_scrubber.setValue(0)
+        self.audio_player.stop()
 
         self.diff_checkboxes = []
 
@@ -627,7 +629,12 @@ class SongWindow(QWidget):
             self.label_creator.setText(f"Beatmapset hosted by {ref.host()}")
             self.audio_path = f"{song_path}/{ref.audio()}"
 
-            media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
+            if self.audio_path.endswith(".ogg"):
+                media = QMediaContent(QUrl.fromLocalFile(self.ogg_to_mp3(self.audio_path)))
+
+            else:
+                media = QMediaContent(QUrl.fromLocalFile(self.audio_path))
+
             self.audio_player.setMedia(media)
             self.length = AudioSegment.from_file(self.audio_path).duration_seconds * 1000 #Extract the length in ms of the mapset's audio.
 
@@ -638,6 +645,19 @@ class SongWindow(QWidget):
             self.process_key()
 
             self.plot.set_axisx(0, self.length / 1000)
+
+    def ogg_to_mp3(self, ogg_file: str) -> str:
+        """Generate a temporary mp3 file if the map's audio is ogg."""
+
+        audio = AudioSegment.from_file(ogg_file, format="ogg")
+
+        with tempfile.NamedTemporaryFile(suffix=".mp3", dir="temp", delete=False) as temp_mp3:
+            temp_mp3.close()
+            mp3_file = temp_mp3.name
+
+            audio.export(mp3_file, format="mp3")
+
+        return mp3_file
 
     def change_smoothing(self, v):
         """Connected to the smoothing slider."""
@@ -825,6 +845,8 @@ class SongWindow(QWidget):
         width = (mw - 90) / mw
         height = (mh - 90) / mh
         self.plot.ax.set_position([left, bottom, width, height])
+        v = self.audio_scrubber.value()
+        self.plot.trace_time(v / 1000)
 
         ny = ey
         self.sel_all.setGeometry(30, ny, 85, 40)
@@ -870,12 +892,11 @@ class SongWindow(QWidget):
 
         v = self.audio_player.position()
 
-        worker = ProcessingPool()
-
         self.audio_scrubber.blockSignals(True)
         self.audio_scrubber.setValue(v)
         t = self.timestamp_form(v)
         self.audio_timestamp.setText(t)
+        v = self.length if v > self.length else v
         self.plot.trace_time(v / 1000)
         self.audio_scrubber.blockSignals(False)
 
@@ -883,8 +904,10 @@ class SongWindow(QWidget):
         """Connected to the audio scrubber"""
 
         self.audio_player.setPosition(v)
+        self.audio_player.stop()
         t = self.timestamp_form(v)
         self.audio_timestamp.setText(t)
+        v = self.length if v > self.length else v
         self.plot.trace_time(v / 1000)
 
     def toggle_mute(self):
