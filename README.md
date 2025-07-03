@@ -14,18 +14,7 @@ Yeah, the UI was inspired by Mapset Verifier.
 
   ![](https://media1.tenor.com/m/F-LgB1xTebEAAAAd/look-at-this-graph-nickelback.gif)
 
-## Plans
-- Unfuck Windows Scaling causing giant text in the app
-- Bracket detection
-- Shield/reverse shield detection
-- Per-column strain
-- In-app audio player that traces along the graph.
-- Optimization
-
-## Examples
-Here is a difficulty gap between two difficulties created by a big difference in jack usage:
-
-  ![](https://hugged.s-ul.eu/2nzse1tE)
+## Example
 
 Here is the density progression in a very large spread:
 
